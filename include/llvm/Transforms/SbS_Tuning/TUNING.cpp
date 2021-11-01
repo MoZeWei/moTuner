@@ -304,11 +304,12 @@ namespace{
             exit(1);
         }
         int m,n,k;
-        int max_size = 0;
+        //TO.DO.: Every variable about pool_size should be size_t type
+        size_t max_size = 0;
         //update the pool_m/n/k
         while(fs>>m>>n>>k)
         {
-            int cur_pool_size = sizeof(float)*(
+            size_t cur_pool_size = sizeof(float)*(
                                 2*m*k +                                    
                                 2*k*n +                                    
                                 m*n*2) +                                    
@@ -336,7 +337,11 @@ namespace{
         if(!fs)
         {
             std::cout<<"Cannot open the last pass error file"<<std::endl;
-            exit(1);
+            //TO.DO.: Fucking build one
+            std::fstream new_fs(last_pass_seperate_error_file_path,std::ios::out);
+            new_fs<<"";
+            new_fs.close();
+            fs.open(last_pass_seperate_error_file_path,std::ios::in);
         }
         int id,p[3];
         float running_time,avg_err,max_err;
@@ -1333,7 +1338,7 @@ namespace{
                                 {
                                     //NOTE.: replace original gemmex with tuning gemmex, its result is output to the optimized data file
                                     //In the last two pass(next_func_id is always -1), so it wont come down here.
-                                    std::cout<<gemm_id_tracer<<"?="<<next_func_id<<std::endl;
+                                    //std::cout<<gemm_id_tracer<<"?="<<next_func_id<<std::endl;
                                     if(gemm_id_tracer == next_func_id)
                                     {
                                         std::cout<<"The "<<gemm_id_tracer<<"th GemmEx is next to tune"<<std::endl;
