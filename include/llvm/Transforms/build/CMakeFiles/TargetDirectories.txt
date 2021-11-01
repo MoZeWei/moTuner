@@ -1,0 +1,14 @@
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/CMakeFiles/rebuild_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/CMakeFiles/acc_gen.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/CMakeFiles/edit_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/CMakeFiles/intrinsics_gen.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/CMakeFiles/omp_gen.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/Mark_Dimension_FuncID/CMakeFiles/rebuild_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/Mark_Dimension_FuncID/CMakeFiles/MDFID.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/Mark_Dimension_FuncID/CMakeFiles/edit_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/SbS_Tuning/CMakeFiles/rebuild_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/SbS_Tuning/CMakeFiles/TUNING.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/SbS_Tuning/CMakeFiles/edit_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/data_flow/CMakeFiles/rebuild_cache.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/data_flow/CMakeFiles/flow.dir
+/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/data_flow/CMakeFiles/edit_cache.dir

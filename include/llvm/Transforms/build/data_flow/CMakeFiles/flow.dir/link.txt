@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wall -fno-rtti -shared  -o libflow.so CMakeFiles/flow.dir/flow.cpp.o   -L/mnt/data/home/mzw/hipcc_llvm_4.3.0/lib 

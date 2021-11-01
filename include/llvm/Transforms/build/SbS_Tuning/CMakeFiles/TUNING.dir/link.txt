@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wall -fno-rtti -shared  -o libTUNING.so CMakeFiles/TUNING.dir/TUNING.cpp.o   -L/mnt/data/home/mzw/hipcc_llvm_4.3.0/lib 
