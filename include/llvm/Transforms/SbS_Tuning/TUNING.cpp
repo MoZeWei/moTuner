@@ -686,12 +686,14 @@ namespace{
                 }
             }
         }
-        //"use" means that this argument is def/not as an operand somewhere.
+        //"use" means that this argument is def(not as an operand) somewhere.
         for(auto use = called_arg->use_begin(), use_end = called_arg->use_end(); use != use_end; use++)
         {
             if(Instruction * inst = dyn_cast<Instruction>(*use))
             {
                 //errs()<<"use: "<<*inst<<"\n";
+                //TO.DO.: If we meet the %s = call func(), ignore it.               DONE
+                if(isa<CallInst>(inst)) continue;
                 for(auto i = 0; i < inst->getNumOperands(); i++)
                 {
                     Value * related_v = inst->getOperand(i);
@@ -728,6 +730,27 @@ namespace{
             errs()<<"It has total "<<parent_func->arg_size()<<" arguments\n";
         }
         */
+
+        //Expand the related field of called_arg, we care about every related variable whether they
+        //corresponding to the arg of caller_func
+        //TO.DO.: DFS on all related arg of current target_arg, and compare it with all arg of parent func
+        //Once it's matched, jump out!
+        //This map-search's target is within current parent func, it will not produce conflict to the one in dataflow_dfs
+        if(dfsed_value_map.find(target_arg) != dfsed_value_map.end() && dfsed_value_map[target_arg])    return;
+        else dfsed_value_map[target_arg] = true;
+        for(auto user = target_arg->user_begin(), user_end = target_arg->user_end();
+            user != user_end; user++)
+        {
+            if(Instruction * inst = dyn_cast<Instruction>(*user))
+            {
+                if(isa<CallInst>(inst))
+                {
+                    //QUES.: Should I care about a CallInst?
+                }
+            }
+        }
+
+
         //NOTE: We cannot use getNumOperands to get the argument list size of a function def
         for(size_t i = 0; i < parent_func->arg_size(); i++)
         {
