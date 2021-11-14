@@ -92,6 +92,6 @@
 #define HAVE_SYSEXITS_H 1
 
 /* Define to 1 to enable the experimental new pass manager by default */
-#define LLVM_ENABLE_NEW_PASS_MANAGER 1
+#define LLVM_ENABLE_NEW_PASS_MANAGER 0
 
 #endif

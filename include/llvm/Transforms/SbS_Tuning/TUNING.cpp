@@ -604,7 +604,7 @@ namespace{
                         //errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
                         //we only care about those gemmex that accept this arg as output
                         //NOTE: This makes us wont add gemmex itself into its dependence list
-                        if(called_arg==call_inst->getOperand(14))
+                        if(called_arg==call_inst->getArgOperand(14))
                         {
                             //TO.DO.: Avoid searching the same gemm                        //DONE
                             if( related_gemm_id_map.find(target_id) != related_gemm_id_map.end()
@@ -699,8 +699,8 @@ namespace{
                     Value * related_v = inst->getOperand(i);
                     Type * ty = related_v->getType();
                     //errs()<<i<<"th operand "<<*related_v<<" of inst "<<*inst<<"\n";
-                    if(ty->isIntegerTy()) continue;
-                    if(related_v == called_arg) continue;
+                    if(ty->isIntegerTy()) continue;                                                                 //Because we may incur a instruction using constant Int to calculate address pointer
+                    if(related_v == called_arg) continue;                                                           //This is to avoid the instruction like a = a, but this will be eliminated by compiler
                     else 
                     {
                         //errs()<<*called_arg<<" => "<<*related_v<<"\n";
@@ -719,6 +719,8 @@ namespace{
         //NOTE: We should only jump out form the gemmex function, Avoiding jumping into some common functional functions
     }
 
+    //jump_out_of_parent should be alike to the data_dfs but without digging in.
+    //so it need its own dfs
     void TUNING::jump_out_of_parent(Value * target_arg, Function * parent_func, int target_id, std::unordered_map<Value*,bool>& dfsed_value_map)
     {
         //errs()<<parent_func->getName()<<"\n";
@@ -738,20 +740,78 @@ namespace{
         //This map-search's target is within current parent func, it will not produce conflict to the one in dataflow_dfs
         if(dfsed_value_map.find(target_arg) != dfsed_value_map.end() && dfsed_value_map[target_arg])    return;
         else dfsed_value_map[target_arg] = true;
-        for(auto user = target_arg->user_begin(), user_end = target_arg->user_end();
-            user != user_end; user++)
+
+        for(auto user = target_arg->user_begin(), user_end = target_arg->user_end(); user != user_end; user++)
         {
-            if(Instruction * inst = dyn_cast<Instruction>(*user))
+            if(Instruction * inst = dyn_cast<CallInst>(*user))
             {
                 if(isa<CallInst>(inst))
                 {
-                    //QUES.: Should I care about a CallInst?
+                    CallInst * call_inst = dyn_cast<CallInst>(inst);
+                    Function * called_func = call_inst->getCalledFunction();
+                    if(called_func && called_func->getName() == "hipblasGemmEx")
+                    {
+                        int cur_id = gemm_call_inst_int_map[inst];
+                        //errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
+                        //we only care about those gemmex that accept this arg as output
+                        //NOTE: This makes us wont add gemmex itself into its dependence list
+                        if(target_arg==call_inst->getArgOperand(14))
+                        {
+                            //TO.DO.: Avoid searching the same gemm                        //DONE
+                            if( related_gemm_id_map.find(target_id) != related_gemm_id_map.end()
+                                &&is_in_list<int>(related_gemm_id_map[target_id],cur_id))
+                            {
+                                //do nothing
+                                //errs()<<"We occur the same GemmEx with id "<<cur_id<<"\n";
+                            }
+                            else
+                            {
+                                //errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
+                                related_gemm_id_map[target_id].push_back(cur_id);
+                                //dataflow_dfs(call_inst->getOperand(7),caller_func, cur_id, dfsed_value_map);
+                                //dataflow_dfs(call_inst->getOperand(10),caller_func, cur_id, dfsed_value_map);
+                                //dataflow_dfs(call_inst->getOperand(14),caller_func, cur_id, dfsed_value_map);
+                            }
+                        }
+                        else
+                            continue;
+                    }
+                    else
+                    {
+                        //we should not care about other function call
+                    }
+                }
+                else
+                {
+                    Value * ret_v = dynamic_cast<Value*>(inst);
+                    jump_out_of_parent(ret_v,parent_func,target_id,dfsed_value_map);
+                }
+            }
+        }
+
+        //Because we only care about what produces such a value, the defs matter. So we only iterate on use-def chain
+        for(auto use = target_arg->use_begin(), use_end = target_arg->use_end(); use != use_end; use++ )
+        {
+            if(Instruction * inst = dyn_cast<Instruction>(*use))
+            {
+                for(auto i = 0; i < inst->getNumOperands(); i++)
+                {
+                    Value * related_v = inst->getOperand(i);
+                    Type * ty = related_v->getType();
+                    if(ty->isIntegerTy()) continue;
+                    if(related_v == target_arg) continue;
+                    else
+                    {
+                        jump_out_of_parent(related_v,parent_func,target_id,dfsed_value_map);
+                    }
                 }
             }
         }
 
 
         //NOTE: We cannot use getNumOperands to get the argument list size of a function def
+        //Here we cpmpare the target_arg to the argument signment in the def of current function
+        //Once its matched, it can jump out.
         for(size_t i = 0; i < parent_func->arg_size(); i++)
         {
             Value * arg = parent_func->getArg(i);
@@ -770,7 +830,7 @@ namespace{
                         Value * target_passed_arg = call_inst->getArgOperand(i);
                         Function * new_parent_func = call_inst->getParent()->getParent();
                         //errs()<<*target_arg<<" ^> "<<*target_passed_arg<<"\n";
-                        dataflow_dfs(target_passed_arg,new_parent_func,target_id, dfsed_value_map);
+                        jump_out_of_parent(target_passed_arg,new_parent_func,target_id, dfsed_value_map);
                     }
                 }
             }
@@ -1132,6 +1192,7 @@ namespace{
                 }
                 FunctionType * hipFree_func_type = hipFree_func_ptr->getFunctionType();
 
+                /*
                 //TO.DO.: Create a nested pointer of gvar_ptr_mempool                                   //No need to do
                 //insert a line of code hipMalloc((void**)&mzw_mempool,pool_size)
                 //In LLVM IR, the nested pointer should be i8 **
@@ -1142,13 +1203,14 @@ namespace{
                     errs()<<"Fail to create int8_ptr_type\n";
                     exit(1);
                 }
+                
                 PointerType * nested_int8ptr_type = int8_ptr_type->getPointerTo();
                 if(nested_int8ptr_type == nullptr)
                 {
                     errs()<<"Fail to create nested int8** type\n";
                     exit(1);
                 }
-                /*
+                
                 Value * pool_ptr_ptr = builder.CreateBitCast(gvar_ptr_mempool,nested_int8ptr_type,"mzw_pool_ptr_ptr");
                 if(!pool_ptr_ptr)
                 {

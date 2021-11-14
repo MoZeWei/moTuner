@@ -9,7 +9,7 @@
 #define BUG_REPORT_URL "https://bugs.llvm.org/"
 
 /* Default linker to use. */
-#define CLANG_DEFAULT_LINKER "lld"
+#define CLANG_DEFAULT_LINKER ""
 
 /* Default C/ObjC standard to use. */
 /* #undef CLANG_DEFAULT_STD_C */
@@ -55,10 +55,10 @@
 #define DEFAULT_SYSROOT ""
 
 /* Directory where gcc is installed. */
-#define GCC_INSTALL_PREFIX ""
+#define GCC_INSTALL_PREFIX "/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47"
 
 /* Define if we have libxml2 */
-/* #undef CLANG_HAVE_LIBXML */
+#define CLANG_HAVE_LIBXML 1
 
 /* Define if we have sys/resource.h (rlimits) */
 #define CLANG_HAVE_RLIMITS 1
