@@ -1,1 +1,1 @@
-/usr/bin/c++ -fPIC -Wall -fno-rtti -shared  -o libTUNING.so CMakeFiles/TUNING.dir/TUNING.cpp.o   -L/mnt/data/home/mzw/hipcc_llvm_4.3.0/lib 
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/bin/g++ -fPIC -Wall -fno-rtti -shared  -o libTUNING.so CMakeFiles/TUNING.dir/TUNING.cpp.o   -L/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1 

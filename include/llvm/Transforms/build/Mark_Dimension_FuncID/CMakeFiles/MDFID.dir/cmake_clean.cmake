@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/MDFID.dir/MDFID.cpp.o"
+  "CMakeFiles/MDFID.dir/MDFID.cpp.o.d"
   "libMDFID.pdb"
   "libMDFID.so"
 )

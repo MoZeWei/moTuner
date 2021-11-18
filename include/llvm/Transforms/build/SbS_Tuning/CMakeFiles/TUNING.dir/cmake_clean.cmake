@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/TUNING.dir/TUNING.cpp.o"
+  "CMakeFiles/TUNING.dir/TUNING.cpp.o.d"
   "libTUNING.pdb"
   "libTUNING.so"
 )

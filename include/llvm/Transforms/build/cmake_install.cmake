@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms
+# Install script for directory: /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,7 +29,7 @@ endif()
 
 # Install shared libraries without execute permission?
 if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-  set(CMAKE_INSTALL_SO_NO_EXE "1")
+  set(CMAKE_INSTALL_SO_NO_EXE "0")
 endif()
 
 # Is this installation the result of a crosscompile?
@@ -44,9 +44,10 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/Mark_Dimension_FuncID/cmake_install.cmake")
-  include("/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/SbS_Tuning/cmake_install.cmake")
-  include("/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/data_flow/cmake_install.cmake")
+  include("/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Mark_Dimension_FuncID/cmake_install.cmake")
+  include("/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/SbS_Tuning/cmake_install.cmake")
+  include("/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/data_flow/cmake_install.cmake")
+  include("/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Profiling/cmake_install.cmake")
 
 endif()
 
@@ -58,5 +59,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/data/home/mzw/hipcc_llvm_4.3.0/include/llvm/Transforms/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
