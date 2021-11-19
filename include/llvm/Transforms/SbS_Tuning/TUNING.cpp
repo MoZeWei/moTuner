@@ -1128,7 +1128,7 @@ namespace{
         }
         GlobalVariable * gvar_ptr_mempool = new GlobalVariable(M,int8PtrType,false,GlobalValue::CommonLinkage,
                                                                 0,"mzw_mempool");
-        gvar_ptr_mempool->setAlignment(MaybeAlign(4));
+        gvar_ptr_mempool->setAlignment(MaybeAlign(8));
         ConstantPointerNull * NULLPTR = ConstantPointerNull::get(int8PtrType);
         if(NULLPTR == nullptr)
         {

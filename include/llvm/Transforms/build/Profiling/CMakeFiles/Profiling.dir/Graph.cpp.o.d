@@ -1,5 +1,5 @@
-Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/Profiling/Profiling.cpp \
+Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: \
+ /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/Profiling/Graph.cpp \
  /usr/include/stdc-predef.h \
  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/string \
  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -331,18 +331,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: \
  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Operator.h \
  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/ValueHandle.h \
  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Mangler.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Analysis/LoopInfo.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassManager.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/TinyPtrVector.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassInstrumentation.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/Any.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassManagerInternal.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/TimeProfiler.h \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/TypeName.h \
- /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/list \
- /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_list.h \
- /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/list.tcc \
- /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Allocator.h \
  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/unordered_map \
  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/hashtable.h \
  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/hashtable_policy.h \

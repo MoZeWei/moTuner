@@ -14,32 +14,18 @@
 #include "llvm/IR/Mangler.h"
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/Constant.h"
+#include "llvm/Analysis/LoopInfo.h"
+#include<unordered_map>
+#include "Graph.h"
 
 using namespace llvm;
-
+using namespace graph;
 //This pass is to insert timing function before & after each function and also analysis 
 //data dependencies among functions.
 
 //Construct graph for each function
 
 namespace{
-    struct Node{
-        Function * func;
-        std::vector<Node*> succ;
-        size_t undone_prec;
-    };
-
-    struct SuperNode{
-        Node * node_list;
-    };
-
-    //A function has a graph
-    //A branch has a graph(if-else), including loop
-    struct Graph{
-        Node * Entry_Node;
-
-    };
-
 
     struct Profiling : public ModulePass{
         static char ID;
@@ -50,11 +36,12 @@ namespace{
         bool runOnModule(Module & M) override;
         std::string get_father_dir(std::string);
         void get_tool_library_func(Module & M);
+        void getAnalysisUsage(AnalysisUsage &AU) const override;
 
         //data
         std::string profiling_data_file_path;
         std::unordered_map<Function*,bool> tool_func_map;
-
+        std::unordered_map<CallInst*,Node*> callinst_node_map;
 
     };
 
@@ -64,6 +51,10 @@ namespace{
 
     Profiling::~Profiling(){
 
+    }
+
+    void Profiling::getAnalysisUsage(AnalysisUsage &AU) const{
+        AU.addRequired<LoopInfoWrapperPass>();
     }
 
     bool Profiling::runOnModule(Module & M){
@@ -91,7 +82,7 @@ namespace{
             exit(1);
         }
         gpu_start_event_ptr->setInitializer(NULLPTR);
-
+        gpu_end_event_ptr->setInitializer(NULLPTR);
 
         //In order to construct the ddg of each function(CPU function, GPU kernel and Memcpy)
         //First we need to identify them
@@ -102,18 +93,96 @@ namespace{
 
         get_tool_library_func(M);
 
+
+        //In fact, we need to handle all branch and loop first, just make them as a sub-graph
+        //then hash them into a set, in the second walk(handle the sequential instruction) ingnore
+        //those hashed inst.
+        //Also, in the first walk, should we identify input and output of each function?
         for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
             func_end = M.getFunctionList().end(); func != func_end; func++)
         {
-            if(tool_func_map.find(func) != tool_func_map.end()) continue;
+            Function * cur_func = dyn_cast<Function>(func);
+            if(tool_func_map.find(cur_func) != tool_func_map.end()) continue;
+            else if(cur_func->size() == 0) continue;
+
+            LoopInfo & LI = getAnalysis<LoopInfoWrapperPass>(*cur_func).getLoopInfo();
+            size_t loop_counter = 0;
+            for(Loop * L : LI)        //this is for every outmost(top-level) loop?
+            {
+                errs()<<"Loop "<<++loop_counter<<"\n";
+                //11-19 consider one bb, not nested loop
+                for(BasicBlock * bb : L->getBlocks())
+                {
+                    for(BasicBlock::iterator inst = bb->begin(), inst_end = bb->end();
+                        inst != inst_end; inst++)
+                    {
+                        
+                    }
+                }
+            }
+        }
+
+        //Second walk.
+        for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
+            func_end = M.getFunctionList().end(); func != func_end; func++)
+        {
+            Function * caller_func = dyn_cast<Function>(func);
+            if(caller_func == nullptr)
+            {
+                errs()<<"Fail to get the caller func\n";
+                exit(1);
+            }
+            //We only care about the control flow in a function, we dont care the whole CFG
+            //So we have a general garph in a function, but a sub-graph representing a loop / branch
+            //is also a part of the general graph.
+            GRAPH G;
+            
+            if(tool_func_map.find(caller_func) != tool_func_map.end()) continue;
             
             size_t inst_counter = 0;
             std::string func_name = func->getName().str();
             for(Function::iterator bb = func->begin(), bb_end = func->end(); bb != bb_end; bb++)
             {
-                for(BasicBlock::iterator inst = bb->begin, inst_end = bb->end; inst != inst_end; inst++)
+                for(BasicBlock::iterator inst = bb->begin(), inst_end = bb->end(); inst != inst_end; inst++)
                 {
                     inst_counter++;
+                    if(isa<CallInst>(inst))
+                    {
+                        Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
+                        if(called_func == nullptr)
+                        {
+                            continue;
+                        }
+                        CallInst * call_inst = dyn_cast<CallInst>(inst);
+                        std::string called_func_name = called_func->getName().str();
+                        if(called_func_name == "hipLaunchKernel")
+                        {
+                            //get the first argument as target kernel function
+                            //errs()<<"We get one kernel call inst\n";
+                            Value * v = dyn_cast<Value>(call_inst->getArgOperand(0));
+                            //errs()<<*v<<"\n";
+                            Function * kernel_func = dyn_cast<Function>(v->stripPointerCasts());
+                            //errs()<<kernel_func->getName();
+                            //errs()<<"\n";
+
+                            //GPUFuncNode * node = GPUFuncNode(call_inst,kernel_func,true);
+                            //G.Insert()
+                        }
+                        else if(called_func_name.find("cpu_") == 0)
+                        {
+                            //This is a cpu function
+                            Function * cpu_func = dyn_cast<Function>(call_inst->getFunction());
+                            
+                        }
+                        else if(called_func_name == "hipMemcpy")
+                        {
+                            //This is memcpy
+                        }
+                        else
+                        {
+                            //These are considered to be cpu function(how about hipblasGemmEx etc.?)
+                        }
+                    }
                 }
             }
         }
@@ -145,6 +214,7 @@ namespace{
     void Profiling::get_tool_library_func(Module & M)
     {
         //TO.DO.: 
+        
     }
 
 }

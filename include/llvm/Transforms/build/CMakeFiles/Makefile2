@@ -257,7 +257,7 @@ Mark_Dimension_FuncID/CMakeFiles/MDFID.dir/clean:
 SbS_Tuning/CMakeFiles/TUNING.dir/all:
 	$(MAKE) $(MAKESILENT) -f SbS_Tuning/CMakeFiles/TUNING.dir/build.make SbS_Tuning/CMakeFiles/TUNING.dir/depend
 	$(MAKE) $(MAKESILENT) -f SbS_Tuning/CMakeFiles/TUNING.dir/build.make SbS_Tuning/CMakeFiles/TUNING.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=5,6 "Built target TUNING"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=6,7 "Built target TUNING"
 .PHONY : SbS_Tuning/CMakeFiles/TUNING.dir/all
 
 # Build rule for subdir invocation for target.
@@ -283,7 +283,7 @@ SbS_Tuning/CMakeFiles/TUNING.dir/clean:
 data_flow/CMakeFiles/flow.dir/all:
 	$(MAKE) $(MAKESILENT) -f data_flow/CMakeFiles/flow.dir/build.make data_flow/CMakeFiles/flow.dir/depend
 	$(MAKE) $(MAKESILENT) -f data_flow/CMakeFiles/flow.dir/build.make data_flow/CMakeFiles/flow.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=7,8 "Built target flow"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=8,9 "Built target flow"
 .PHONY : data_flow/CMakeFiles/flow.dir/all
 
 # Build rule for subdir invocation for target.
@@ -309,12 +309,12 @@ data_flow/CMakeFiles/flow.dir/clean:
 Profiling/CMakeFiles/Profiling.dir/all:
 	$(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/depend
 	$(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=3,4 "Built target Profiling"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles --progress-num=3,4,5 "Built target Profiling"
 .PHONY : Profiling/CMakeFiles/Profiling.dir/all
 
 # Build rule for subdir invocation for target.
 Profiling/CMakeFiles/Profiling.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Profiling/CMakeFiles/Profiling.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/CMakeFiles 0
 .PHONY : Profiling/CMakeFiles/Profiling.dir/rule

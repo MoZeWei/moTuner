@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Profiling.dir/Graph.cpp.o"
+  "CMakeFiles/Profiling.dir/Graph.cpp.o.d"
   "CMakeFiles/Profiling.dir/Profiling.cpp.o"
   "CMakeFiles/Profiling.dir/Profiling.cpp.o.d"
   "libProfiling.pdb"

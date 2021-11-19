@@ -130,6 +130,30 @@ Profiling/fast:
 	cd /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build && $(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/build
 .PHONY : Profiling/fast
 
+Graph.o: Graph.cpp.o
+.PHONY : Graph.o
+
+# target to build an object file
+Graph.cpp.o:
+	cd /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build && $(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o
+.PHONY : Graph.cpp.o
+
+Graph.i: Graph.cpp.i
+.PHONY : Graph.i
+
+# target to preprocess a source file
+Graph.cpp.i:
+	cd /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build && $(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/Graph.cpp.i
+.PHONY : Graph.cpp.i
+
+Graph.s: Graph.cpp.s
+.PHONY : Graph.s
+
+# target to generate assembly for a file
+Graph.cpp.s:
+	cd /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build && $(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/Graph.cpp.s
+.PHONY : Graph.cpp.s
+
 Profiling.o: Profiling.cpp.o
 .PHONY : Profiling.o
 
@@ -163,6 +187,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Profiling"
+	@echo "... Graph.o"
+	@echo "... Graph.i"
+	@echo "... Graph.s"
 	@echo "... Profiling.o"
 	@echo "... Profiling.i"
 	@echo "... Profiling.s"
