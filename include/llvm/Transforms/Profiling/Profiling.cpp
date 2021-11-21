@@ -98,6 +98,7 @@ namespace{
         //then hash them into a set, in the second walk(handle the sequential instruction) ingnore
         //those hashed inst.
         //Also, in the first walk, should we identify input and output of each function?
+        //TO.DO.:  Handle the Loop Graph
         for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
             func_end = M.getFunctionList().end(); func != func_end; func++)
         {
@@ -122,6 +123,12 @@ namespace{
             }
         }
 
+        //We use this map to collect graph of each function, and walk through main() to build the whole CFG
+        std::unordered_map<Function *, Seq_Graph*> Func_SG_map;
+
+        //NOTE: When we have a function, the first argument(int32) n means the following n arguments
+        //are output values(also input values)
+
         //Second walk.
         for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
             func_end = M.getFunctionList().end(); func != func_end; func++)
@@ -132,15 +139,26 @@ namespace{
                 errs()<<"Fail to get the caller func\n";
                 exit(1);
             }
+            if(caller_func->size() == 0)
+            {
+                errs()<<"Func "<<caller_func->getName()<<" size is 0\n";
+                continue;
+            }
             //We only care about the control flow in a function, we dont care the whole CFG
             //So we have a general garph in a function, but a sub-graph representing a loop / branch
             //is also a part of the general graph.
-            GRAPH G;
-            
+            Seq_Graph * SG;
+            if(Func_SG_map.find(caller_func) != Func_SG_map.end()) SG = Func_SG_map[caller_func];
+            else
+            {
+                SG = new Seq_Graph();
+                Func_SG_map[caller_func] = SG;
+            } 
+
             if(tool_func_map.find(caller_func) != tool_func_map.end()) continue;
             
             size_t inst_counter = 0;
-            std::string func_name = func->getName().str();
+            //std::string func_name = func->getName().str();
             for(Function::iterator bb = func->begin(), bb_end = func->end(); bb != bb_end; bb++)
             {
                 for(BasicBlock::iterator inst = bb->begin(), inst_end = bb->end(); inst != inst_end; inst++)
@@ -165,28 +183,76 @@ namespace{
                             //errs()<<kernel_func->getName();
                             //errs()<<"\n";
 
-                            //GPUFuncNode * node = GPUFuncNode(call_inst,kernel_func,true);
-                            //G.Insert()
+                            GPUFuncNode * node = new GPUFuncNode(call_inst,kernel_func,true,true);
+                            Node * prev_node = SG->get_last_Node();
+                            SG->Insert(node,prev_node);
+
+                            //Register Input/Output Value
+                            Value * output_value_n = call_inst->getArgOperand(0);
+                            if(ConstantInt * CI = dyn_cast<ConstantInt>(output_value_n))
+                            {
+                                size_t output_n = CI->getZExtValue();
+                                size_t n = call_inst->getNumArgOperands();
+                                for(size_t i = 1; i < n; i++)
+                                {
+                                    //TO.DO.: How to locate the right input argument?
+                                    //if(i < 1 + output_n) node->add_output_value()
+                                }
+                            }
+                            else
+                            {
+                                errs()<<"1st argument of Function "<<called_func_name<<" is not constant value\n";
+                                exit(1);
+                            }
+
                         }
-                        else if(called_func_name.find("cpu_") == 0)
+                        else if(called_func_name.find("cpu_") != -1)
                         {
                             //This is a cpu function
                             Function * cpu_func = dyn_cast<Function>(call_inst->getFunction());
                             
+                            CPUFuncNode * node = new CPUFuncNode(call_inst,cpu_func,false,true);
+                            Node * prev_node = SG->get_last_Node();
+                            SG->Insert(node,prev_node);
                         }
                         else if(called_func_name == "hipMemcpy")
                         {
                             //This is memcpy
+                            Function * memcpy_func = dyn_cast<Function>(call_inst->getFunction());
+                            MemcpyNode * node = new MemcpyNode(call_inst,memcpy_func,false,false);             //QUES.: Should the gpu_flag be true?
+                            Node * prev_node = SG->get_last_Node();
+                            SG->Insert(node,prev_node);
                         }
                         else
                         {
                             //These are considered to be cpu function(how about hipblasGemmEx etc.?)
+                            //So far, we dont consider about hipblas stuff.
+                            //TO.DO.: But hipMalloc should be specified to handle.
+                            Function * cpu_library_func = dyn_cast<Function>(call_inst->getCalledFunction());
+                            //errs()<<"we meet "<<cpu_library_func->getName()<<"\n";
+                            CPUFuncNode * node = new CPUFuncNode(call_inst,cpu_library_func,false,false);
+                            Node * prev_node = SG->get_last_Node();
+                            SG->Insert(node,prev_node);
                         }
+                    }
+                    else
+                    {
+                        //These instructions will be collected by data-flow analysis of each call_inst
+                        //For those instructions might not be collected after all these, maybe it's time to kick off
+                        //collect them as InstNode and bundle related ones into one SuperNode
+                        //So now we dont have to handle them here.
                     }
                 }
             }
+
+            //TO.DO.: Print out the function Seq-Graph                              DONE
+            //errs()<<"This is Seq_Graph for Function "<<caller_func->getName()<<"\n";
+            //SG->Print_allNode();
+
         }
 
+        //TO.DO.: Analysis data input & output of each cpu/gpu function
+        //Only passed pointer argument can be modified and affect other functions
 
         return true;
     }
