@@ -150,6 +150,13 @@ Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: ../Profiling/Graph.cpp \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/basic_file.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/c++io.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/fstream.tcc \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/queue \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/deque \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_deque.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/deque.tcc \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_heap.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_queue.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/uses_allocator.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Pass.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/PassAnalysisSupport.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/STLExtras.h \
@@ -169,7 +176,6 @@ Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: ../Profiling/Graph.cpp \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/algorithm \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_algo.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/algorithmfwd.h \
-  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_heap.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_tempbuf.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/uniform_int_dist.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/limits \
@@ -179,7 +185,6 @@ Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: ../Profiling/Graph.cpp \
   /usr/include/string.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/tuple \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/array \
-  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/uses_allocator.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/invoke.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/None.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/memory \
@@ -338,9 +343,6 @@ Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: ../Profiling/Graph.cpp \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Format.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/FileSystem/UniqueID.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/stack \
-  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/deque \
-  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_deque.h \
-  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/deque.tcc \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_stack.h \
   /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/LegacyPassManager.h \
   ../IPO/PassManagerBuilder.h \
@@ -365,7 +367,30 @@ Profiling/CMakeFiles/Profiling.dir/Graph.cpp.o: ../Profiling/Graph.cpp \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/hashtable.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/hashtable_policy.h \
   /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/unordered_map.h \
-  ../Profiling/Graph.h
+  ../Profiling/Graph.h \
+  ../Utils/BasicBlockUtils.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/SetVector.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Analysis/DomTreeUpdater.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Dominators.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/DepthFirstIterator.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/set \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_set.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_multiset.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassManager.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/TinyPtrVector.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassInstrumentation.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/Any.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassManagerInternal.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/TimeProfiler.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/TypeName.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/list \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_list.h \
+  /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/list.tcc \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/GenericDomTree.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/CFGDiff.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/CFGUpdate.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Analysis/LoopInfo.h \
+  /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Allocator.h
 
 Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
   /usr/include/stdc-predef.h \
@@ -746,6 +771,8 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
   ../Profiling/Graph.h
 
 
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/CFGDiff.h:
+
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/list.tcc:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_list.h:
@@ -759,6 +786,14 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/TinyPtrVector.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/PassManager.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_multiset.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Analysis/DomTreeUpdater.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/SetVector.h:
+
+../Utils/BasicBlockUtils.h:
 
 ../Profiling/Graph.h:
 
@@ -790,25 +825,15 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_stack.h:
 
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/deque.tcc:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_deque.h:
-
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/stack:
 
-/usr/include/bits/posix1_lim.h:
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/FileSystem/UniqueID.h:
 
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Attributes.inc:
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Format.h:
 
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_relops.h:
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/CFGUpdate.h:
 
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/SwapByteOrder.h:
-
-/usr/include/string.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Config/llvm-config.h:
-
-/usr/include/sched.h:
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Debug.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ciso646:
 
@@ -816,7 +841,9 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Pass.h:
 
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/memoryfwd.h:
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/deque.tcc:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/cstdint:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/fstream:
 
@@ -838,6 +865,8 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/cwctype:
 
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_deque.h:
+
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/DataTypes.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/ios_base.h:
@@ -845,8 +874,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /usr/include/linux/errno.h:
 
 /usr/include/bits/select.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Debug.h:
 
 ../Profiling/Profiling.cpp:
 
@@ -868,11 +895,11 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /usr/include/bits/stdlib-float.h:
 
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/DenseMap.h:
+
+/usr/include/alloca.h:
+
 /usr/include/sys/sysmacros.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/algorithm:
-
-/usr/include/sys/select.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/PointerUnion.h:
 
@@ -898,6 +925,14 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/GlobalVariable.h:
 
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/ErrorOr.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ext/alloc_traits.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_heap.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/NativeFormatting.h:
+
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/ctype_inline.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/atomic_word.h:
@@ -919,6 +954,10 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/vector.tcc:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/DiagnosticHandler.h:
+
+/usr/include/sched.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Config/llvm-config.h:
 
 /usr/include/stdio.h:
 
@@ -949,12 +988,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ext/type_traits.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/c++locale.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/shared_mutex:
-
-/usr/include/asm-generic/errno-base.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/c++io.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_iterator.h:
 
@@ -987,10 +1020,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/streambuf:
 
 /usr/include/bits/typesizes.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/deque:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/APInt.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/ValueHandle.h:
 
@@ -1048,13 +1077,13 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm-c/Error.h:
 
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/memoryfwd.h:
+
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/ptr_traits.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/char_traits.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/basic_file.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/FileSystem/UniqueID.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_pair.h:
 
@@ -1074,8 +1103,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ext/new_allocator.h:
 
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/cstddef:
-
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/istream.tcc:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_iterator_base_types.h:
@@ -1083,6 +1110,8 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_multimap.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stringfwd.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_queue.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ostream:
 
@@ -1110,6 +1139,8 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/error_constants.h:
 
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/DepthFirstIterator.h:
+
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/chrono:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/map:
@@ -1123,6 +1154,10 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /usr/include/libio.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/lib/gcc/x86_64-pc-linux-gnu/8.5.0/include/stdint.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/APInt.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/deque:
 
 /usr/include/bits/endian.h:
 
@@ -1151,6 +1186,8 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/functional:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/debug/debug.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Dominators.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/GlobalObject.h:
 
@@ -1184,13 +1221,9 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ext/numeric_traits.h:
 
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/set:
+
 /usr/include/bits/byteswap-16.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/cstdint:
-
-/usr/include/alloca.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/DenseMap.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Metadata.h:
 
@@ -1214,19 +1247,39 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/gthr-default.h:
 
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/queue:
+
+/usr/include/sys/select.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/algorithm:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/x86_64-pc-linux-gnu/bits/c++io.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/shared_mutex:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Attributes.inc:
+
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/cxxabi_forced.h:
 
 /usr/include/pthread.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/FileSystem.h:
 
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/SwapByteOrder.h:
+
+/usr/include/string.h:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/cstddef:
+
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_relops.h:
+
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/IRBuilderFolder.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_algo.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_heap.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/NativeFormatting.h:
 
 /usr/include/bits/byteswap.h:
 
@@ -1390,13 +1443,17 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Casting.h:
 
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/User.h:
+/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_set.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/StringExtras.h:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/User.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/mutex:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ctime:
+
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/GenericDomTree.h:
 
 /usr/include/bits/pthreadtypes.h:
 
@@ -1407,10 +1464,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/Attributes.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/bits/stl_tree.h:
-
-/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/ext/alloc_traits.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/ErrorOr.h:
 
 /mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-x86_64_v3/gcc-4.8.5/gcc-8.5.0-r653aprkmt2xeqxzz4locto6dy3hxl47/include/c++/8.5.0/condition_variable:
 
@@ -1455,8 +1508,6 @@ Profiling/CMakeFiles/Profiling.dir/Profiling.cpp.o: ../Profiling/Profiling.cpp \
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/IR/DerivedTypes.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/SmallPtrSet.h:
-
-/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Support/Format.h:
 
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/ADT/SmallVector.h:
 

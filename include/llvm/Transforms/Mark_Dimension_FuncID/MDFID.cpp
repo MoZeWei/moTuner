@@ -175,26 +175,26 @@ namespace {
             exit(1);
         }
         //called wrapper function to replace _Z6GemmExiiiiii function
-        Function * wrapper_GemmEx_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S3_");
+        Function * wrapper_GemmEx_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S5_");
         if(wrapper_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the wGEf func\n";
             exit(1);
         }
 
-        Function * faster_Gemm_func_ptr = M.getFunction("_Z14mzw_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iii");
+        Function * faster_Gemm_func_ptr = M.getFunction("_Z14mzw_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iii");
         if(faster_Gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the fGfp func\n";
             exit(1);
         }
-        Function * tuning_GemmEx_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S_");
+        Function * tuning_GemmEx_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
         if(tuning_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tuning gemm ptr\n";
             exit(1);
         }
-        Function * checker_GemmEx_func_ptr = M.getFunction("_Z18mzw_checker_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiiiiPcS3_");
+        Function * checker_GemmEx_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
         if(checker_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tuning gemm ptr\n";
@@ -224,7 +224,7 @@ namespace {
                     {
                         //QUES.: What about InvokeInst which means indirect call?
                         Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
-                        if(called_func && called_func->getName() == "hipblasGemmEx" && dyn_cast<Instruction>(inst)->getParent()->getParent() != faster_Gemm_func_ptr
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex" && dyn_cast<Instruction>(inst)->getParent()->getParent() != faster_Gemm_func_ptr
                             && dyn_cast<Instruction>(inst)->getParent()->getParent() != wrapper_GemmEx_func_ptr
                             && dyn_cast<Instruction>(inst)->getParent()->getParent() != tuning_GemmEx_func_ptr
                             && dyn_cast<Instruction>(inst)->getParent()->getParent() != checker_GemmEx_func_ptr)   //TO.DO.: cmp to all func in tool_library containing GemmEx!                                                                     //TO.DO.: Need to ensure the GemmEx in tool_library will not be modified

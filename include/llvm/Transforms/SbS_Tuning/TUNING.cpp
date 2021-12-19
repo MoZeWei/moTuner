@@ -76,8 +76,8 @@ namespace{
 
     TUNING::TUNING() : ModulePass(ID)
     {
-        max_err_threshold = 1.0;
-        avg_err_threshold = 0.1;
+        max_err_threshold = std::numeric_limits<float>::max();
+        avg_err_threshold = 0.0005;
         last_tuned_id = -1;                                 //To check when first tuning
     }
 
@@ -171,7 +171,10 @@ namespace{
                     key += std::to_string(p[i]);
                 }
                 funcid_keys[id].push_back(key);
-                if(data.find(key) != data.end())
+                //if(data.find(key) != data.end())
+                //For gemm running repeatedly, we only care about its final output
+                //So we overwrite its former record with the last one
+                if(false)
                 {
                     float total_running_time = data[key][0] * data[key][3];
                     float total_avg_err = data[key][1] * data[key][3];
@@ -356,7 +359,8 @@ namespace{
                 key += std::to_string(e);
             }
             //funcid_keys[id].push_back(key);
-            if(data.find(key) != data.end())
+            //if(data.find(key) != data.end())
+            if(false)
             {
                 float total_running_time = data[key][0] * data[key][3];
                 float total_avg_err = data[key][1] * data[key][3];
@@ -431,7 +435,7 @@ namespace{
     void TUNING::get_tool_library_func(Module& M, std::unordered_map<Function*,int> &tool_func_map)
     {
         //get all function pointer in tool-library, these function should not be scanned and optimized
-        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S_");
+        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
         if(tuning_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tunning fuc\n";
@@ -461,14 +465,14 @@ namespace{
             exit(1);
         }
         tool_func_map[output_ErrP_func_ptr] = 1;
-        Function * checkerr_func_ptr = M.getFunction("_Z23mzw_check_hipblas_error15hipblasStatus_t");
+        Function * checkerr_func_ptr = M.getFunction("_Z23mzw_check_rocblas_error15rocblas_status_");
         if(checkerr_func_ptr == nullptr)
         {
             errs()<<"Cannot get the che func\n";
             exit(1);
         }
         tool_func_map[checkerr_func_ptr] = 1;
-        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S3_");
+        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S5_");
         if(wrapper_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the wrapper_gemm func\n";
@@ -482,7 +486,7 @@ namespace{
             exit(1);
         }
         tool_func_map[rcrp_func_ptr] = 1;
-        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iii");
+        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iii");
         if(fastermul_func_ptr == nullptr)
         {
             errs()<<"Cannot get the faster_mul func\n";
@@ -517,28 +521,28 @@ namespace{
             exit(1);
         }
         tool_func_map[devicecast_func_ptr] = 1;
-        Function * quan_func_ptr = M.getFunction("_Z8mzw_quanPvS_iiPf17hipblasDatatype_tb");
+        Function * quan_func_ptr = M.getFunction("_Z8mzw_quanPvS_iiPf17rocblas_datatype_b");
         if(quan_func_ptr == nullptr)
         {
             errs()<<"Cannot get quan func\n";
             exit(1);
         }
         tool_func_map[quan_func_ptr] = 1;
-        Function * dequan_func_ptr = M.getFunction("_Z10mzw_dequanPvS_iiPf17hipblasDatatype_t");
+        Function * dequan_func_ptr = M.getFunction("_Z10mzw_dequanPvS_iiPf17rocblas_datatype_");
         if(dequan_func_ptr == nullptr)
         {
             errs()<<"Cannot get dequan func\n";
             exit(1);
         }
         tool_func_map[dequan_func_ptr] = 1;  
-        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iiiiPcS3_");
+        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiPcS5_");
         if(checker_faster_mul_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_faster_mul func\n";
             exit(1);
         }
         tool_func_map[checker_faster_mul_func_ptr] = 1;  
-        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiiiiPcS3_");
+        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
         if(checker_fp32_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_fp32_gemm func\n";
@@ -598,13 +602,13 @@ namespace{
                 {
                     CallInst * call_inst = dyn_cast<CallInst>(inst);
                     Function * called_func = call_inst->getCalledFunction();
-                    if(called_func && called_func->getName() == "hipblasGemmEx")
+                    if(called_func && called_func->getName() == "rocblas_gemm_ex")
                     {
                         int cur_id = gemm_call_inst_int_map[inst];
                         //errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
                         //we only care about those gemmex that accept this arg as output
                         //NOTE: This makes us wont add gemmex itself into its dependence list
-                        if(called_arg==call_inst->getArgOperand(14))
+                        if(called_arg==call_inst->getArgOperand(17))
                         {
                             //TO.DO.: Avoid searching the same gemm                        //DONE
                             if( related_gemm_id_map.find(target_id) != related_gemm_id_map.end()
@@ -615,11 +619,18 @@ namespace{
                             }
                             else
                             {
+                                //QUES.: Because we need to use this in jump_out func, so we may add dunplicated id in related_gemm_id_map?
+                                //(It's because the dfsed_value_map is refreshed before doing jumpout, so in the same parent func as in previous dfs,
+                                //the same gemmex will be marked)
+                                
+
                                 //errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
                                 related_gemm_id_map[target_id].push_back(cur_id);
                                 //dataflow_dfs(call_inst->getOperand(7),caller_func, cur_id, dfsed_value_map);
                                 //dataflow_dfs(call_inst->getOperand(10),caller_func, cur_id, dfsed_value_map);
                                 //dataflow_dfs(call_inst->getOperand(14),caller_func, cur_id, dfsed_value_map);
+
+                                
                             }
                         }
                         else
@@ -739,34 +750,43 @@ namespace{
         //Once it's matched, jump out!
         //This map-search's target is within current parent func, it will not produce conflict to the one in dataflow_dfs
         if(dfsed_value_map.find(target_arg) != dfsed_value_map.end() && dfsed_value_map[target_arg])    return;
-        else dfsed_value_map[target_arg] = true;
+        else 
+        {
+            dfsed_value_map[target_arg] = true;
+            //errs()<<"Processing value: "<<*target_arg<<"\n";
+        }
 
         for(auto user = target_arg->user_begin(), user_end = target_arg->user_end(); user != user_end; user++)
         {
-            if(Instruction * inst = dyn_cast<CallInst>(*user))
+            if(Instruction * inst = dyn_cast<Instruction>(*user))
             {
                 if(isa<CallInst>(inst))
                 {
                     CallInst * call_inst = dyn_cast<CallInst>(inst);
                     Function * called_func = call_inst->getCalledFunction();
-                    if(called_func && called_func->getName() == "hipblasGemmEx")
+                    if(called_func && called_func->getName() == "rocblas_gemm_ex")
                     {
                         int cur_id = gemm_call_inst_int_map[inst];
-                        //errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
+                        errs()<<"Target arg: "<<*target_arg<<"\n";
+                        errs()<<"Target id: "<<target_id<<"\n";
+                        errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
                         //we only care about those gemmex that accept this arg as output
                         //NOTE: This makes us wont add gemmex itself into its dependence list
-                        if(target_arg==call_inst->getArgOperand(14))
+                        if(target_arg==call_inst->getArgOperand(17))
                         {
+                            errs()<<*call_inst<<" Yes!\n";
+                            errs()<<"Target arg: "<<*target_arg<<"\n";
+                            errs()<<"Target id: "<<target_id<<"\n";
                             //TO.DO.: Avoid searching the same gemm                        //DONE
                             if( related_gemm_id_map.find(target_id) != related_gemm_id_map.end()
                                 &&is_in_list<int>(related_gemm_id_map[target_id],cur_id))
                             {
                                 //do nothing
-                                //errs()<<"We occur the same GemmEx with id "<<cur_id<<"\n";
+                                errs()<<"We occur the same GemmEx with id "<<cur_id<<" when targeting "<<target_id<<"\n";
                             }
                             else
                             {
-                                //errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
+                                errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
                                 related_gemm_id_map[target_id].push_back(cur_id);
                                 //dataflow_dfs(call_inst->getOperand(7),caller_func, cur_id, dfsed_value_map);
                                 //dataflow_dfs(call_inst->getOperand(10),caller_func, cur_id, dfsed_value_map);
@@ -776,9 +796,39 @@ namespace{
                         else
                             continue;
                     }
-                    else
+                    else if(called_func)
                     {
                         //we should not care about other function call
+                        //12-6: Here we need to search through current function, to handle the situation like:
+                        //funcC{funcA{gemm()},funcB{gemm()}}, if jump_out and dfs is seperated, we cant handle this right
+                        //so every time we jump out, we need to do some dfs in current function.
+                        //errs()<<"Begin dfs\n";
+                        Function * next_caller_func = call_inst->getCalledFunction();       //This is the same as called_func def before
+                        //errs()<<next_caller_func->getName()<<"\n";
+                        int call_op_num = call_inst->getNumArgOperands();                            //NOTE: Use arg_size instead of getNumOperands
+                        int called_func_arg_num = next_caller_func->arg_size();
+                        //errs()<<"The called func is "<<next_caller_func->getName().str()<<"\n";
+                        //errs()<<"call_inst Operand number is "<<call_op_num<<"\n";
+                        //errs()<<"called func argument number is"<<called_func_arg_num<<"\n";
+                        if(call_op_num != called_func_arg_num) continue;                    //NOTE: We dont support size-changeable function now(like printf)
+                        for(int i = 0; i < call_op_num; i++)
+                        {
+                            if(target_arg == call_inst->getArgOperand(i))
+                            {
+                                /*
+                                if(called_arg->getType()->isIntegerTy()) exit(1);
+                                std::cout<<"Target id is "<<target_id<<"\n";
+                                std::cout<<"The called func is "<<next_caller_func->getName().str()<<"\n";
+                                std::cout<<"The "<<i<<"th operand is matched\n";
+                                std::cout<<"matched passed-in ArgOperand is "<<called_arg->getName().str()<<"\n";
+                                std::cout<<"matched Function Argument is "<<next_caller_func->getArg(i)->getName().str()<<"\n";
+                                */
+                                Value * next_called_arg = next_caller_func->getArg(i);
+                                //errs()<<*called_arg<<" -> "<<*next_called_arg<<" of func "<<next_caller_func->getName()<<"\n";;
+                                dataflow_dfs(next_called_arg,next_caller_func,target_id,dfsed_value_map);
+                            }
+                        }
+
                     }
                 }
                 else
@@ -827,6 +877,7 @@ namespace{
                         //errs()<<"We now jump out of test func\n";
                         //errs()<<"Parent's "<<i<<"th argument is matched\n";
                         CallInst * call_inst = call_inst_list[j];
+                        //errs()<<"To the callInst: "<<*call_inst<<"\n";
                         Value * target_passed_arg = call_inst->getArgOperand(i);
                         Function * new_parent_func = call_inst->getParent()->getParent();
                         //errs()<<*target_arg<<" ^> "<<*target_passed_arg<<"\n";
@@ -855,7 +906,7 @@ namespace{
                     {
                         call_inst_list.push_back(call_inst);
                         Function * called_func = call_inst->getCalledFunction();
-                        if(called_func && called_func->getName() == "hipblasGemmEx")
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex")
                         {
                             errs()<<"We get the "<<++gemmex_id<<"th called GemmEx function in "<<*call_inst<<"\n";
                             gemm_id_call_inst_map[gemmex_id]=call_inst;
@@ -884,10 +935,10 @@ namespace{
                     if(CallInst * call_inst = dyn_cast<CallInst>(inst))
                     {
                         Function * called_func = call_inst->getCalledFunction();
-                        if(called_func && called_func->getName() == "hipblasGemmEx")
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex")
                         {
                             gemmex_id++;
-                            //errs()<<"Now we use "<<gemmex_id<<"th GemmEx as target GemmEx\n";
+                            errs()<<"Now we use "<<gemmex_id<<"th GemmEx as target GemmEx\n";
                             //get MatrixA argument defined before.
                             Value * Matrix1_argv = call_inst->getArgOperand(7);
                             //For those who has a load / related operation previous
@@ -933,7 +984,20 @@ namespace{
                 }
             }
             if(target_index == -1) continue;
-            std::vector<int> backup = it->second;
+            std::vector<int> backup;
+
+            //make element in it unique
+            std::unordered_map<int,int> m;
+            for(auto id : it->second)
+            {
+                if(m.find(id) != m.end()) continue;
+                else
+                {
+                    backup.push_back(id);
+                    m[id] = 1;
+                }
+            }
+
             it->second.clear();
             for(auto candidate_id : backup)
             {
@@ -1067,7 +1131,7 @@ namespace{
 
         //errs()<<"Get all functions in tool-library\n";
 
-        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S_");
+        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
         if(tuning_gemm_func_ptr==nullptr)
         {
             errs()<<"Cannot get the tuning gemm func ptr\n";
@@ -1085,7 +1149,7 @@ namespace{
         }
         FunctionType * fastermul_func_type = fastermul_func_ptr->getFunctionType();
         */
-        Function * fastermul_checker_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iiiiPcS3_");
+        Function * fastermul_checker_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiPcS5_");
         if(fastermul_checker_mul_func_ptr == nullptr)
         {
             errs()<<"Cannot get the faster_mul_checker func ptr\n";
@@ -1095,7 +1159,7 @@ namespace{
 
         //This is for those gemmex which are checked not suitable for faster_mul
         //they also need to print info on single pass err file
-        Function * original_gemm_wrapper_func_ptr = M.getFunction("_Z18mzw_checker_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiiiiPcS3_");
+        Function * original_gemm_wrapper_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
         if(original_gemm_wrapper_func_ptr == nullptr)
         {
             errs()<<"Cannot get the original_gemm_wrapper func ptr\n";
@@ -1269,7 +1333,7 @@ namespace{
                     if(isa<CallInst>(inst))
                     {
                         Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
-                        if(called_func && called_func->getName() == "hipblasGemmEx")
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex")
                         {
                             gemm_id_tracer++;
                             //errs()<<"Now we get the GemmEx\n";
