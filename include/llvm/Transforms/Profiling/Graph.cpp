@@ -213,12 +213,22 @@ namespace graph{
         inst = target_inst;
     }
 
+    InstNode::~InstNode()
+    {
+        //do nothing.
+    }
+
     FuncNode::FuncNode(CallInst * ci, Function * cf, bool gpu_f, bool graph_f)
     {
         call_inst = ci;
         called_func = cf;
         gpu_flag = gpu_f;
         has_graph = graph_f;
+    }
+
+    FuncNode::~FuncNode()
+    {
+        //nothing to do
     }
 
     std::string FuncNode::get_func_name()
@@ -400,6 +410,14 @@ namespace graph{
         End_Node->clear_succ();
     }
 
+    Seq_Graph::~Seq_Graph()
+    {
+        delete Entry_Node;
+        delete End_Node;
+        Entry_Node = nullptr;
+        End_Node = nullptr;
+    }
+
     void Seq_Graph::Insert(Node * target_node, Node * pred_node)
     {
         Node * next_node = pred_node->get_succ(0);
@@ -474,6 +492,14 @@ namespace graph{
         End_Node->add_pred(Entry_Node);
     }
 
+    DAG::~DAG()
+    {
+        delete Entry_Node;
+        Entry_Node = nullptr;
+        delete End_Node;
+        End_Node = nullptr;
+    }
+
     void DAG::ConstructFromSeq_Graph(Seq_Graph * SG)
     {
         std::vector<Node*> empty_vec;
@@ -517,7 +543,8 @@ namespace graph{
             if(type->isPointerTy())
             {
                 new_node->add_input_value(cur_v);
-                Node * pred_node = reverse_find_pred(cur_v,true);
+                
+                Node * pred_node = reverse_find_pred(cur_v,true,true)[0];
                 
                 /*
                 if(pred_node == Entry_Node) errs()<<"raw_Pre_Node is Entry Node\n";
@@ -564,7 +591,8 @@ namespace graph{
             if(type->isPointerTy())
             {
                 new_node->add_output_value(cur_v);
-                Node * waw_pred_node = reverse_find_pred(cur_v,true);
+                
+                Node * waw_pred_node = reverse_find_pred(cur_v,true,true)[0];
                 if(waw_pred_node==nullptr)
                 {
                     errs()<<"Cannot find the waw_pred_node\n";
@@ -574,8 +602,17 @@ namespace graph{
                 if(waw_pred_node == Entry_Node) errs()<<"waw_Pre_Node is Entry Node\n";
                 else waw_pred_node->dump_inst();
                 */
-                Node * war_pred_node = reverse_find_pred(cur_v,false);
-                if(war_pred_node==nullptr)
+                std::vector<Node *> war_pred_nodes = reverse_find_pred(cur_v,false,false);
+
+                /*
+                errs()<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n";
+                node->dump_inst();
+                errs()<<"WAR Pred Nodes:\n";
+                for(auto war_pred_node : war_pred_nodes) war_pred_node->dump_inst();
+                errs()<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n";
+                */
+
+                if(war_pred_nodes.size()==0)
                 {
                     errs()<<"Cannot find the war_pred_node\n";
                     exit(1);
@@ -611,7 +648,7 @@ namespace graph{
 
                 //war_pred_node->add_succ(new_node);
                 //waw_pred_node->add_succ(new_node);
-                pred_nodes.push_back(war_pred_node);
+                for(auto war_pred_node : war_pred_nodes) pred_nodes.push_back(war_pred_node);
                 pred_nodes.push_back(waw_pred_node);
             }
             else continue;
@@ -671,7 +708,8 @@ namespace graph{
                         break;
                     else index++;
                 }
-                if(index < pred_map[End_Node].size())pred_map[End_Node].erase(pred_map[End_Node].begin() + index);
+                if(index < pred_map[End_Node].size())
+                    pred_map[End_Node].erase(pred_map[End_Node].begin() + index);
 
             }
 
@@ -711,10 +749,13 @@ namespace graph{
         //TO.DO.
     }
 
-    Node * DAG::reverse_find_pred(Value * v, bool find_pred_output)
+    std::vector<Node*> DAG::reverse_find_pred(Value * v, bool find_pred_output, bool Only_flag)             //Only_flag is true means we are dealing WAW or RAW
+                                                                                                            //because one value only can be modified once in one layer
+                                                                                                            //and that's the latest pred
     {
         std::queue<Node*> q;
         q.push(End_Node);
+        std::vector<Node*> ans;
         while(!q.empty())
         {
             int n = q.size();
@@ -722,21 +763,30 @@ namespace graph{
             {
                 Node * cur_node = q.front();
                 q.pop();
-                if(cur_node == Entry_Node) return Entry_Node;
+                if(cur_node == Entry_Node)
+                {
+                    ans.push_back(Entry_Node);
+                }
                 std::vector<Value*> target_values = find_pred_output ? cur_node->get_output_value() : cur_node->get_input_value();
                 for(auto target_v : target_values)
                 {
                     if(target_v == v)
                     {
-                        return cur_node;
+                        ans.push_back(cur_node);
+                        if(Only_flag) return ans;
+                        else continue;
                     }
                 }
+                if(cur_node == Entry_Node) continue;
                 size_t cur_pred_num = cur_node->get_pred_num();
-                for(size_t j = 0; j < cur_pred_num; j++) q.push(cur_node->get_pred(j));
+                for(size_t j = 0; j < cur_pred_num; j++) 
+                {
+                    q.push(cur_node->get_pred(j));
+                }
             }
         }
         
-        return nullptr;
+        return ans;
     }
 
     void DAG::dump()
@@ -788,8 +838,6 @@ namespace graph{
                     cur_node->dump_inst();
                 else
                     errs()<<"Entry Node\n";
-                
-                //TO.DO.: Dump the dependency between nodes
                 
                 q.pop();
                 for(auto it = rudu_map.begin(), end = rudu_map.end(); it != end; it++)
@@ -868,6 +916,7 @@ namespace graph{
             }
             level++;
         }
+        n_level = level-1;
     }
 
     void DAG::dump_level()
@@ -888,6 +937,366 @@ namespace graph{
             }
         }
         errs()<<"----------------\n";
+    }
+
+    //Function to help sortPredByUndoneSucc
+    bool cmp(std::pair<Node*,size_t> a, std::pair<Node*,size_t> b)
+    {
+        return a.second < b.second;
+    }
+
+    void DAG::StreamDistribute(StreamGraph * StreamG)
+    {
+        if(!n_level)                                                    //n_level means level num except Entry/End
+        {
+            errs()<<"Wrong Levelize DAG\n";
+            exit(1);
+        }
+        
+        size_t stream_num = StreamG->get_stream_num();
+        
+        for(size_t i = 1; i <= n_level; i++)
+        {
+            std::vector<Node*> nodes = level_nodes_map[i];
+            std::unordered_map<Node*,bool> setted_flag_map;
+            std::unordered_map<Node*,size_t> node_original_index_map;
+            for(auto node: nodes) setted_flag_map[node] = false;
+            
+            //hash for those have no preds except EntryNode
+            for(size_t node_index = 0; node_index < nodes.size(); node_index++)
+            {
+                Node * cur_node = nodes[node_index];
+                node_original_index_map[cur_node] = node_index;
+                if(cur_node->get_pred_num()==1 && cur_node->get_pred(0) == Entry_Node)
+                {
+                    size_t stream_id = node_index % stream_num;
+                    StreamG->node_set_stream(cur_node,stream_id);
+                    StreamG->init_node_undone_succ(cur_node);
+                    //Entry_Node doesn't exist in StreamGraph, no need to reduce its undone succ
+                    //Also, there is no EventEdge produced from this
+                    setted_flag_map[cur_node] = true;
+                }
+            }
+
+            //For the first level, work are done
+            if(i == 1) continue;
+            //Sort Nodes by their pred(from small to big)
+            SortByPredNum(nodes,0,nodes.size()-1);
+
+            for(auto node : nodes)
+            {
+                if(setted_flag_map[node]) continue;
+
+                int stream_end_pred = 0;             //when it's true, means that we need to find the optimal
+                                                            //pred in those which are the end of streams
+                std::vector<Node*> stream_end_preds;
+
+                size_t pred_num = node->get_pred_num();
+                std::vector<std::pair<Node*,size_t>> preds;
+                //Sort pred by their undone succ(increase order)
+                //Collect preds which are end of their streams
+                for(size_t j = 0; j < pred_num; j++)
+                {
+                    Node * cur_pred = node->get_pred(j);
+                    if(StreamG->node_is_end_of_stream(cur_pred)) 
+                    {
+                        stream_end_pred++;
+                        stream_end_preds.push_back(cur_pred);
+                    }
+                    preds.push_back(std::pair<Node*,size_t>(cur_pred,StreamG->get_node_undone_succ(cur_pred)));
+                }
+                std::sort(preds.begin(), preds.end(), cmp);
+                
+                //at least one node will be undone succ for each pred(cur node)
+                //It means no zero in preds' values
+                
+                if(!stream_end_pred)                //Situation 1. No optimal stream can be selected
+                {
+                    //random pick one
+                    size_t stream_id = node_original_index_map[node] % stream_num;
+                    StreamG->node_set_stream(node,stream_id);
+                    StreamG->init_node_undone_succ(node);
+                    //Add EventEdges
+                    for(size_t j = 0; j < pred_num; j++)
+                    {
+                        Node * cur_pred = node->get_pred(j);
+                        StreamG->reduce_node_undone_succ(cur_pred);                 //QUES.: Should the undone_succ_num only affect on the pred which is end of stream?
+                        if(StreamG->get_node_stream(cur_pred) != stream_id)
+                        {
+                            StreamG->add_EE(cur_pred,node);
+                        }
+                    }
+                    setted_flag_map[node] = true;
+                }
+                else if(stream_end_pred == 1)       //Situation 2. only have one pred which is end of its stream
+                {
+                    
+                    Node * target_pred = stream_end_preds[0];
+                    size_t stream_id = StreamG->get_node_stream(target_pred);
+                    StreamG->node_set_stream(node,stream_id);
+                    StreamG->init_node_undone_succ(node);
+                    //Add EventEdges
+                    for(size_t j = 0; j < pred_num; j++)
+                    {
+                        Node * cur_pred = node->get_pred(j);
+                        StreamG->reduce_node_undone_succ(cur_pred);                 //QUES.: Should the undone_succ_num only affect on the pred which is end of stream?
+                        if(StreamG->get_node_stream(cur_pred) != stream_id)
+                        {
+                            StreamG->add_EE(cur_pred,node);
+                        }
+                    }
+                    setted_flag_map[node] = true;
+                }
+                else                                //Situation 3. multiple quanlified preds which are end of their stream s
+                {
+                    //selece the pred with least undone succ
+                    for(auto it = preds.begin(), it_end = preds.end(); it != it_end; it++)
+                    {
+                        Node * target_pred = it->first;
+                        std::vector<Node*>::iterator finder = std::find(stream_end_preds.begin(), stream_end_preds.end(), target_pred);
+                        if(finder == stream_end_preds.end()) continue;
+                        else
+                        {
+                            size_t stream_id = StreamG->get_node_stream(target_pred);
+                            StreamG->node_set_stream(node,stream_id);
+                            StreamG->init_node_undone_succ(node);
+                            for(size_t j = 0; j < pred_num; j++)
+                            {
+                                Node * cur_pred = node->get_pred(j);
+                                StreamG->reduce_node_undone_succ(cur_pred);
+                                if(StreamG->get_node_stream(cur_pred) != stream_id) StreamG->add_EE(cur_pred,node);
+                            }
+                            setted_flag_map[node] = true;
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    int find_pivot(std::vector<Node*> & p, int s, int e)
+    {
+        size_t pivot = p[s]->get_pred_num();
+        int bigger_index = e+1;
+        for(int i = e; i > s; i--)
+        {
+            if(p[i]->get_pred_num() >= pivot)
+            {
+                bigger_index--;
+                Node * tmp = p[i];
+                p[i] = p[bigger_index];
+                p[bigger_index] = tmp;
+            }
+        }
+        bigger_index--;
+        Node * tmp = p[s];
+        p[s] = p[bigger_index];
+        p[bigger_index] = tmp;
+        return bigger_index;
+    }
+
+    void DAG::SortByPredNum(std::vector<Node*> & p, int s, int e)
+    {
+        if(s>=e) return;
+
+        int pivot_index = find_pivot(p,s,e);
+        SortByPredNum(p,s,pivot_index-1);
+        SortByPredNum(p,pivot_index+1,e);
+    }
+
+    EventEdge::EventEdge(Node * a, Node * b)
+    {
+        prev = a;
+        succ = b;
+    }
+
+    void EventEdge::dump()
+    {
+        errs()<<"Prev: ";
+        prev->dump_inst();
+        errs()<<"Succ: ";
+        succ->dump_inst();
+    }
+
+    StreamGraph::StreamGraph()
+    {
+        //do nothing
+    }
+
+    StreamGraph::StreamGraph(size_t n)
+    {
+        stream_n = n;
+        for(size_t i = 0; i < n; i++)
+        {
+            stream_nodes_map[i] = std::vector<Node*>();
+        }
+    }
+
+    StreamGraph::~StreamGraph()
+    {
+        //do nothing
+    }
+
+    void StreamGraph::add_EE(Node * pred, Node * cur)
+    {
+        size_t pred_stream_id = get_node_stream(pred);
+        size_t pred_stream_index = get_node_stream_index(pred,pred_stream_id);
+        std::vector<Node*> same_stream_preds;
+        size_t pred_num = cur->get_pred_num();
+        for(size_t i = 0; i < pred_num; i++)
+        {
+            Node * cur_pred = cur->get_pred(i);
+            size_t cur_pred_stream_id = get_node_stream(cur_pred);
+            size_t cur_pred_stream_index = get_node_stream_index(cur_pred,cur_pred_stream_id);
+            if(cur_pred_stream_id != pred_stream_id) continue;
+            else
+            {
+                if(pred_stream_index > cur_pred_stream_index)
+                {
+                    delete_EE(cur_pred,cur);
+                }
+            }
+        }
+        EEs.push_back(EventEdge(pred,cur));
+    }
+
+    void StreamGraph::delete_EE(Node * pred, Node * cur)
+    {
+        //delete the EE
+        size_t target_index = 0;
+        for(size_t i = 0; i < EEs.size(); i++)
+        {
+            if(EEs[i].prev == pred && EEs[i].succ == cur)
+            {
+                target_index = i;
+            }
+        }
+        if(target_index == EEs.size())
+        {
+            errs()<<"Cannot delete EE\n";
+            exit(1);
+        }
+        else
+        {
+            EEs.erase(EEs.begin() + target_index);
+        }
+    }
+
+    size_t StreamGraph::get_EE_num()
+    {
+        return EEs.size();
+    }
+
+    void StreamGraph::node_set_stream(Node * cur, size_t stream_id)
+    {
+        node_stream_map[cur] = stream_id;
+        stream_nodes_map[stream_id].push_back(cur);
+    }
+
+    size_t StreamGraph::get_node_stream(Node * cur)
+    {
+        if(node_stream_map.find(cur) == node_stream_map.end())
+        {
+            errs()<<"Not recorded in node_stream_map\n";
+            exit(1);
+        }
+        else
+        {
+            return node_stream_map[cur];
+        }
+    }
+
+    size_t StreamGraph::get_node_stream_index(Node * node, size_t stream_id)
+    {
+        size_t index = 0;
+        for(Node * target_node : stream_nodes_map[stream_id])
+        {
+            if(target_node == node) break;
+            else index++;
+        }
+        if(index == stream_nodes_map[stream_id].size()) 
+        {
+            errs()<<"Cannot get the index of node\n";
+            exit(1);
+        }
+        return index;
+    }
+
+    bool StreamGraph::node_is_end_of_stream(Node * cur)
+    {
+        for(auto it = stream_nodes_map.begin(), it_end = stream_nodes_map.end(); it != it_end; it++)
+        {
+            if(it->second.back() == cur) return true;
+        }
+        return false;
+    }
+
+    void StreamGraph::init_node_undone_succ(Node * node)
+    {
+        //We count EndNode in DAG here but it wont be the node we need to operate in StreamGraph
+        size_t succ_num = node->get_succ_num();
+        unset_succ_num_map[node] = succ_num;
+    }
+
+    void StreamGraph::reduce_node_undone_succ(Node * cur)
+    {
+        if(unset_succ_num_map.find(cur) == unset_succ_num_map.end())
+        {
+            errs()<<"Not recorded in unset_succ_num_map\n";
+            exit(1);
+        }
+        else
+        {
+            unset_succ_num_map[cur]--;
+        }
+    }
+
+    size_t StreamGraph::get_node_undone_succ(Node * cur)
+    {
+        if(unset_succ_num_map.find(cur) == unset_succ_num_map.end())
+        {
+            errs()<<"Not recorded in unset_succ_num_map\n";
+            exit(1);
+        }
+        else
+        {
+            return unset_succ_num_map[cur];
+        }
+    }
+
+    size_t StreamGraph::get_stream_num()
+    {
+        return stream_n;
+    }    
+
+    void StreamGraph::dump_Graph()
+    {
+        errs()<<"**********************\n";
+        errs()<<"StreamGraph:\n";
+        for(auto it = stream_nodes_map.begin(), it_end = stream_nodes_map.end(); it != it_end; it++)
+        {
+            size_t stream_id = it->first;
+            errs()<<"The "<<stream_id<<"th Stream:\n";
+            for(Node * node : it->second)
+            {
+                node->dump_inst();
+            }
+        }
+        errs()<<"**********************\n";
+    }
+
+    void StreamGraph::dump_EEs()
+    {
+        errs()<<"**********************\n";
+        errs()<<"EventEdge:\n";
+        for(size_t i = 0; i < EEs.size(); i++)
+        {
+            EEs[i].dump();
+        }
+        errs()<<"**********************\n";
+
     }
 
 }

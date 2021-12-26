@@ -98,8 +98,9 @@ namespace{
         auto hipStream_t_PtrPtrT = PointerType::get(hipStream_t_PtrT,0);
         ConstantPointerNull * NULLPTR = ConstantPointerNull::get(hipStream_t_PtrT);
 
-        GlobalVariable * stream_var_ptrs [10];
-        for(int i = 0; i < 10; i++)
+        size_t stream_num = 2;
+        GlobalVariable * stream_var_ptrs [stream_num];
+        for(int i = 0; i < stream_num; i++)
         {
             stream_var_ptrs[i] = new GlobalVariable(M,hipStream_t_PtrT,false,GlobalValue::CommonLinkage,0,"mzw_s"+std::to_string(i));
             stream_var_ptrs[i]->setAlignment(MaybeAlign(8));
@@ -107,7 +108,35 @@ namespace{
             stream_var_ptrs[i]->setInitializer(NULLPTR);
         }
 
-        //TO.DO.: use hipcreateStream() to init stream        
+        //TO.DO.: use hipcreateStream() to init stream in main()
+        //define hipStreamCreate()
+        std::vector<Type*> StreamPtrPtr(1,hipStream_t_PtrPtrT);
+        FunctionType * i32_FuncType = FunctionType::get(Type::getInt32Ty(M.getContext()),StreamPtrPtr,false);
+        Function * CreateStreamFunc = Function::Create(i32_FuncType,Function::ExternalLinkage,"hipStreamCreate",M);
+        
+
+        for(auto func = M.getFunctionList().begin(), func_end = M.getFunctionList().end(); 
+            func != func_end; func++)
+        {
+            Function * cur_func = dyn_cast<Function>(func);
+            if(cur_func->getName().str() == "main")
+            {
+                BasicBlock * first_bb = dyn_cast<BasicBlock>(cur_func->begin());
+                Instruction * first_inst = dyn_cast<Instruction>(first_bb->getFirstInsertionPt());
+                IRBuilder<> builder(first_inst);
+                for(int i = 0; i < stream_num; i++)
+                {
+                    Value * cur_stream_ptr = dyn_cast<Value>(stream_var_ptrs[i]);
+                    std::vector<Value*> args = {cur_stream_ptr};
+                    if(!builder.CreateCall(i32_FuncType,CreateStreamFunc,makeArrayRef(args)))
+                    {
+                        errs()<<"Cannot create call of hipStreamCreate()\n";
+                        exit(1);
+                    }
+                }
+            }
+        }
+        
 
         //In order to construct the ddg of each function(CPU function, GPU kernel and Memcpy)
         //First we need to identify them
@@ -153,6 +182,7 @@ namespace{
         //We use this map to collect graph of each function, and walk through main() to build the whole CFG
         std::unordered_map<Function *, Seq_Graph*> Func_SG_map;
         std::unordered_map<Function *, DAG*> Func_DAG_map;
+        std::unordered_map<Function *, StreamGraph*> Func_StreamG_map;
         //NOTE: When we have a function, the first argument(int32) n means the following n arguments
         //are output values(also input values)
 
@@ -182,7 +212,9 @@ namespace{
             
             Seq_Graph * SG;
             DAG * dag;
-            if(Func_SG_map.find(caller_func) != Func_SG_map.end() && Func_DAG_map.find(caller_func) != Func_DAG_map.end()) 
+            StreamGraph * Stream_G;
+            if(Func_SG_map.find(caller_func) != Func_SG_map.end() && 
+                Func_DAG_map.find(caller_func) != Func_DAG_map.end() && Func_StreamG_map.find(caller_func) != Func_StreamG_map.end()) 
             {
                 continue;
             }
@@ -190,8 +222,10 @@ namespace{
             {
                 SG = new Seq_Graph();
                 dag = new DAG();
+                Stream_G = new StreamGraph(stream_num);
                 Func_SG_map[caller_func] = SG;
                 Func_DAG_map[caller_func] = dag;
+                Func_StreamG_map[caller_func] = Stream_G;
             } 
 
             size_t inst_counter = 0;
@@ -227,11 +261,12 @@ namespace{
                             GPUFuncNode * node = new GPUFuncNode(call_inst,kernel_func,true,true);
                             node->CollectBBs(M);
 
-                            node->SetStream(stream_var_ptrs[kernel_counter % 10]);
+                            //Selece Stream for kernel node (Only For DEBUG)
+                            //node->SetStream(stream_var_ptrs[kernel_counter % stream_num]);
 
-                            node->dump_inst();
-                            node->dumpBBs();
-                            errs()<<"***************\n";
+                            //node->dump_inst();
+                            //node->dumpBBs();
+                            //errs()<<"***************\n";
                             
                             Node * prev_node = SG->get_last_Node();
                             SG->Insert(node,prev_node);
@@ -321,20 +356,21 @@ namespace{
             //SG->Print_allNode();
 
             //Construct DAG
-            //TO.DO.: 
             //dag->dump();
             //errs()<<"Begin to construct DAG from SG\n";
             dag->ConstructFromSeq_Graph(SG);
-            //dag->dump();
+            dag->dump();
             dag->levelize();
             //dag->dump_level();
+            //TO.DO.: Dump the linkage among nodes
 
+            //Distribute stream to kernel and add right event (Not moving bb yet)
+            dag->StreamDistribute(Stream_G);
+            Stream_G->dump_Graph();
+            Stream_G->dump_EEs();
         }
 
-        //TO.DO.: Analysis data input & output of each cpu/gpu function
-        //Only passed pointer argument can be modified and affect other functions
 
-        //TO.DO.: Partiton the basic blocks of each node (kernel/memcpy)
 
         return true;
     }
@@ -487,8 +523,8 @@ namespace{
                 }
             }
         }
-        //errs()<<"The input operand of "<<*call_inst<<" are:\n";
-        //for(auto arg : res) errs()<<*arg<<"\n";
+        errs()<<"The input operand of "<<*call_inst<<" are:\n";
+        for(auto arg : res) errs()<<*arg<<"\n";
         return res;
     }
 

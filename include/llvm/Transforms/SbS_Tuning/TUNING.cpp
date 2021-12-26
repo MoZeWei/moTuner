@@ -77,7 +77,7 @@ namespace{
     TUNING::TUNING() : ModulePass(ID)
     {
         max_err_threshold = std::numeric_limits<float>::max();
-        avg_err_threshold = 0.0005;
+        avg_err_threshold = 0.005;
         last_tuned_id = -1;                                 //To check when first tuning
     }
 

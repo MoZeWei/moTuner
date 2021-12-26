@@ -30,7 +30,7 @@ namespace graph{
         
         public:
             Node();
-            ~Node();
+            virtual ~Node();
             //TO.DO.: Provide API for setting succ & pred(including clear, push_back, return specified node)
             void clear_succ(Node *);
             void clear_pred(Node *);
@@ -57,7 +57,7 @@ namespace graph{
 
     class InstNode : public Node{
         private:
-        Instruction * inst;
+            Instruction * inst;
         
         public:
             InstNode(Instruction*);
@@ -73,6 +73,7 @@ namespace graph{
 
         public:
             FuncNode(CallInst*, Function *, bool, bool);
+            ~FuncNode();
             void SetupDep();                                //TO.DO.
             std::string get_func_name();
             void dump_func();
@@ -114,6 +115,7 @@ namespace graph{
 
         public:
             Seq_Graph();
+            ~Seq_Graph();
             void Insert(Node *, Node *);                //First is inserted node, Second is the node before inserted node. In SeqGraph, this may not be neccessary
             void Delete(Node *);
             Node * get_last_Node();
@@ -122,6 +124,8 @@ namespace graph{
             void WalkGraph();                           //TO.DO.: Pass a function pointer which is applied on each element of graph
             void Print_allNode();
     };
+
+    class StreamGraph;
 
     //A function has a graph
     //A branch has a graph(if-else), including loop
@@ -136,6 +140,7 @@ namespace graph{
             std::unordered_map<Node*,std::vector<Node*>> pred_map;
         public:
             DAG();
+            ~DAG();
             void ConstructFromSeq_Graph(Seq_Graph *);
             void Insert(Node *);                                            //Need to find all pred nodes of inserted node,       
             void Delete(Node *);
@@ -143,8 +148,44 @@ namespace graph{
             size_t get_level(Node *);
             void levelize();
             void dump_level();
-            Node * reverse_find_pred(Value *, bool);                              //backward BFS
+            std::vector<Node*> reverse_find_pred(Value *, bool, bool);                              //backward BFS
             void dump();                                                    //Generate a graph
+            void StreamDistribute(StreamGraph *);
+            void SortByPredNum(std::vector<Node*> &, int, int);
+            
+    };
+
+    struct EventEdge{
+        Node * prev;
+        Node * succ;
+        EventEdge(Node*,Node*);
+        void dump();
+    };
+
+    class StreamGraph : public Node{
+        private:
+            int stream_n;
+            std::vector<EventEdge> EEs;
+            std::unordered_map<Node*,size_t> node_stream_map;
+            std::unordered_map<size_t,std::vector<Node*>> stream_nodes_map;
+            std::unordered_map<Node*,size_t> unset_succ_num_map;
+        public:
+            StreamGraph(size_t);
+            StreamGraph();
+            ~StreamGraph();
+            void add_EE(Node*,Node*);                               //TO.DO.: Make sure that cur_node only have one EE with another stream
+            void delete_EE(Node*,Node*);
+            size_t get_EE_num();
+            void node_set_stream(Node*,size_t);
+            size_t get_node_stream(Node*);
+            size_t get_node_stream_index(Node *, size_t);
+            bool node_is_end_of_stream(Node*);
+            void init_node_undone_succ(Node*);
+            void reduce_node_undone_succ(Node*);
+            size_t get_node_undone_succ(Node*);
+            size_t get_stream_num();
+            void dump_Graph();
+            void dump_EEs();
     };
 }
     
