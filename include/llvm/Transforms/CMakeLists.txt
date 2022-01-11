@@ -3,6 +3,7 @@ project(Mark_Dimension_FuncID)
 project(SbS_Tuning)
 project(data_flow)
 project(Profiling)
+project(Final_Gen)
 
 # support C++14 features used by LLVM 10.0.0
 set(CMAKE_CXX_STANDARD 14)
@@ -17,3 +18,4 @@ add_subdirectory(Mark_Dimension_FuncID)
 add_subdirectory(SbS_Tuning)
 add_subdirectory(data_flow)
 add_subdirectory(Profiling)
+add_subdirectory(Final_Gen)

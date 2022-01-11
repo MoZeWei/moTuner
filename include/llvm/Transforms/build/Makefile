@@ -207,6 +207,19 @@ Profiling/fast:
 	$(MAKE) $(MAKESILENT) -f Profiling/CMakeFiles/Profiling.dir/build.make Profiling/CMakeFiles/Profiling.dir/build
 .PHONY : Profiling/fast
 
+#=============================================================================
+# Target rules for targets named GEN
+
+# Build rule for target.
+GEN: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 GEN
+.PHONY : GEN
+
+# fast build rule for target.
+GEN/fast:
+	$(MAKE) $(MAKESILENT) -f Final_Gen/CMakeFiles/GEN.dir/build.make Final_Gen/CMakeFiles/GEN.dir/build
+.PHONY : GEN/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -218,6 +231,7 @@ help:
 	@echo "... acc_gen"
 	@echo "... intrinsics_gen"
 	@echo "... omp_gen"
+	@echo "... GEN"
 	@echo "... MDFID"
 	@echo "... Profiling"
 	@echo "... TUNING"

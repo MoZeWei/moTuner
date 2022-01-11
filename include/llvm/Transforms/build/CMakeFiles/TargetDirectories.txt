@@ -15,3 +15,6 @@
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Profiling/CMakeFiles/rebuild_cache.dir
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Profiling/CMakeFiles/Profiling.dir
 /mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Profiling/CMakeFiles/edit_cache.dir
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Final_Gen/CMakeFiles/rebuild_cache.dir
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Final_Gen/CMakeFiles/GEN.dir
+/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build/Final_Gen/CMakeFiles/edit_cache.dir

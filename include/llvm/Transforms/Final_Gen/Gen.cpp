@@ -65,7 +65,7 @@ namespace{
         std::unordered_map<Function*,int> tool_func_map;
         get_tool_library_func(M,tool_func_map);
 
-        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iii");
+        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iii");
         if(fastermul_func_ptr == nullptr)
         {
             errs()<<"Cannot get the fastermul func ptr\n";
@@ -202,51 +202,59 @@ namespace{
                         if(isa<CallInst>(inst))
                         {
                             Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
-                            if(called_func && called_func->getName() == "hipblasGemmEx")
+                            if(called_func && called_func->getName() == "rocblas_gemm_ex")
                             {
                                 gemm_counter++;
                                 if(is_in_list<int>(runned_funcID_list,gemm_counter))
                                 {
-                                    std::cout<<"The "<<gemm_counter<<"th GemmEx is replaced by faster_mul"<<std::endl;
-                                    CallInst * call_inst = dyn_cast<CallInst>(inst);
-                                    std::vector<Value*> args;
-                                    unsigned int args_num = call_inst->arg_size();
-                                    for(auto i = 0; i < args_num; i++)
+                                    //check the recorded args for this gemm
+                                    if(gemm_arg_m[gemm_counter][0] == -1)
                                     {
-                                        Value * argv = call_inst->getArgOperand(i);
-                                        args.push_back(argv);
+                                        //dont modify it
                                     }
-
-                                    IRBuilder<> builder(dyn_cast<Instruction>(inst));
-                                    Value * argv_poolptr = builder.CreateLoad(gvar_ptr_mempool,"mzw_pool_ptr");
-                                    if(argv_poolptr == nullptr)
+                                    else
                                     {
-                                        errs()<<"Cannot get pool ptr for faster_mul func\n";
-                                        exit(1);
-                                    }
-                                    args.push_back(argv_poolptr);
-
-                                    for(int i = 0; i < 3; i++)
-                                    {
-                                        ConstantInt * constantInt_pi = builder.getInt32(gemm_arg_m[gemm_counter][i]);
-                                        if(constantInt_pi == nullptr)
+                                        CallInst * call_inst = dyn_cast<CallInst>(inst);
+                                        std::vector<Value*> args;
+                                        unsigned int args_num = call_inst->arg_size();
+                                        for(unsigned int i = 0; i < args_num; i++)
                                         {
-                                            errs()<<"Cannot get the constant pi as arg\n";
+                                            Value * argv = call_inst->getArgOperand(i);
+                                            args.push_back(argv);
+                                        }
+                                        
+                                        IRBuilder<> builder(call_inst);
+                                        
+                                        Value * argv_poolptr = builder.CreateLoad(gvar_ptr_mempool,"mzw_pool_ptr");
+                                        if(argv_poolptr == nullptr)
+                                        {
+                                            errs()<<"Cannot get poolptr arg for checker_faster_mul func\n";
                                             exit(1);
                                         }
-                                        Value * argv_pi = dynamic_cast<Value*>(constantInt_pi);
-                                        args.push_back(argv_pi);
-                                    }
+                                        args.push_back(argv_poolptr);
 
-                                    Value * faster_mul_ret_v = builder.CreateCall(fastermul_func_type,fastermul_func_ptr,makeArrayRef(args));
-                                    if(!faster_mul_ret_v)
-                                    {
-                                        errs()<<"Cannot create the call inst of faster_mul func\n";
-                                        exit(1);
-                                    }
-                                    call_inst->replaceAllUsesWith(faster_mul_ret_v);
+                                        for(int i = 0 ; i < 3; i ++)
+                                        {
+                                            ConstantInt * constantInt_pi = builder.getInt32(gemm_arg_m[gemm_counter][i]);
+                                            if(constantInt_pi == nullptr)
+                                            {
+                                                errs()<<"Cannot gen int pi for fastermul\n";
+                                                exit(1);
+                                            }
+                                            Value * argv_pi = dynamic_cast<Value*>(constantInt_pi);
+                                            args.push_back(argv_pi);
+                                        }
 
-                                    inst_del.push_back(call_inst);
+                                        Value * fastermul_ret_v = builder.CreateCall(fastermul_func_type,fastermul_func_ptr,makeArrayRef(args));
+                                        if(!fastermul_ret_v)
+                                        {
+                                            errs()<<"Cannot create the call inst of faster_mul func\n";
+                                            exit(1);
+                                        }
+                                        call_inst->replaceAllUsesWith(fastermul_ret_v);
+
+                                        inst_del.push_back(call_inst);
+                                    }
                                 }
                             }
                         }
@@ -262,10 +270,11 @@ namespace{
 
     }
 
+
     void Gen::get_tool_library_func(Module& M, std::unordered_map<Function*,int> &tool_func_map)
     {
         //get all function pointer in tool-library, these function should not be scanned and optimized
-        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S_");
+        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S2_");
         if(tuning_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tunning fuc\n";
@@ -288,35 +297,35 @@ namespace{
             exit(1);
         }
         tool_func_map[output_FuncID_func_ptr] = 1;
-        Function * output_ErrP_func_ptr = M.getFunction("_Z31mzw_output_Err_Performance_fileiiiifffPc");
+        Function * output_ErrP_func_ptr = M.getFunction("_Z31mzw_output_Err_Performance_fileiiiiifffPc");
         if(output_ErrP_func_ptr == nullptr)
         {
             errs()<<"Cannot get the oep func\n";
             exit(1);
         }
         tool_func_map[output_ErrP_func_ptr] = 1;
-        Function * checkerr_func_ptr = M.getFunction("_Z23mzw_check_hipblas_error15hipblasStatus_t");
+        Function * checkerr_func_ptr = M.getFunction("_Z23mzw_check_rocblas_error15rocblas_status_");
         if(checkerr_func_ptr == nullptr)
         {
             errs()<<"Cannot get the che func\n";
             exit(1);
         }
         tool_func_map[checkerr_func_ptr] = 1;
-        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiPcS3_S3_");
+        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S5_");
         if(wrapper_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the wrapper_gemm func\n";
             exit(1);
         }
         tool_func_map[wrapper_gemm_func_ptr] = 1;
-        Function * rcrp_func_ptr = M.getFunction("_Z35mzw_Result_Check_Record_PerformancePvS_iiiiiifPci");
+        Function * rcrp_func_ptr = M.getFunction("_Z35mzw_Result_Check_Record_PerformancePvS_iiiiiiifPci");
         if(rcrp_func_ptr == nullptr)
         {
             errs()<<"Cannot get the rcrp func\n";
             exit(1);
         }
         tool_func_map[rcrp_func_ptr] = 1;
-        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iii");
+        Function * fastermul_func_ptr = M.getFunction("_Z14mzw_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iii");
         if(fastermul_func_ptr == nullptr)
         {
             errs()<<"Cannot get the faster_mul func\n";
@@ -351,28 +360,28 @@ namespace{
             exit(1);
         }
         tool_func_map[devicecast_func_ptr] = 1;
-        Function * quan_func_ptr = M.getFunction("_Z8mzw_quanPvS_iiPf17hipblasDatatype_tb");
+        Function * quan_func_ptr = M.getFunction("_Z8mzw_quanPvS_iiPf17rocblas_datatype_b");
         if(quan_func_ptr == nullptr)
         {
             errs()<<"Cannot get quan func\n";
             exit(1);
         }
         tool_func_map[quan_func_ptr] = 1;
-        Function * dequan_func_ptr = M.getFunction("_Z10mzw_dequanPvS_iiPf17hipblasDatatype_t");
+        Function * dequan_func_ptr = M.getFunction("_Z10mzw_dequanPvS_iiPf17rocblas_datatype_");
         if(dequan_func_ptr == nullptr)
         {
             errs()<<"Cannot get dequan func\n";
             exit(1);
         }
         tool_func_map[dequan_func_ptr] = 1;  
-        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tS_iiiiPcS3_");
+        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiiPcS5_");
         if(checker_faster_mul_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_faster_mul func\n";
             exit(1);
         }
         tool_func_map[checker_faster_mul_func_ptr] = 1;  
-        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExPv18hipblasOperation_tS0_iiiS_S_17hipblasDatatype_tiS_S1_iS_S_S1_iS1_17hipblasGemmAlgo_tiiiiPcS3_");
+        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiiPcS5_");
         if(checker_fp32_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_fp32_gemm func\n";
@@ -380,6 +389,7 @@ namespace{
         }
         tool_func_map[checker_fp32_gemm_func_ptr] = 1;  
     }
+
 
     template<typename T>
     bool Gen::is_in_list(std::vector<T> l, T target)
@@ -456,15 +466,15 @@ namespace{
             exit(1);
         }
 
-        int id;
+        int id,runtime_counter;
         int p[3];
         float running_time, avg_err, max_err;
-        while(fs>>id>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
+        while(fs>>id>>runtime_counter>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
         {
-            if(gemm_arg_m.find(id) != gemm_arg_m.end()) continue;
+            if(gemm_arg_m.find(id) != gemm_arg_m.end()) continue;               //Here we only read args for each func once
             for(int i = 0; i < 3; i++)
             {
-                gemm_arg_m[id][i] = p[i];
+                gemm_arg_m[id].push_back(p[i]);
             }
         }
         fs.close();

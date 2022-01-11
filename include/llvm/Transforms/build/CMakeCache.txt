@@ -145,7 +145,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=Profiling
+CMAKE_PROJECT_NAME:STATIC=Final_Gen
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -208,6 +208,15 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+
+//Value Computed by CMake
+Final_Gen_BINARY_DIR:STATIC=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms/build
+
+//Value Computed by CMake
+Final_Gen_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+Final_Gen_SOURCE_DIR:STATIC=/mnt/sdb1/home/mzw/HIPCC_LLVM_4.3.1/include/llvm/Transforms
 
 //Path to a file.
 LIBXML2_INCLUDE_DIR:PATH=/mnt/sdb1/public/yum/env/v1/spack/opt/spack/linux-centos7-zen/gcc-8.5.0/libxml2-2.9.12-ulj3x4flm53hif5exq5uok2tbunhlzoi/include/libxml2
@@ -379,7 +388,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

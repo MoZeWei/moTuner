@@ -40,6 +40,7 @@ namespace {
         bool set_funcIDfile_path(std::string module_id);
         bool set_MemAddrfile_path(std::string module_id);
         std::string get_father_path(std::string);
+        int CountAllGemmEx(Module & M);
 
         //self data
         int Func_Counter;
@@ -118,6 +119,67 @@ namespace {
         return res;
     }
 
+    int MDFID::CountAllGemmEx(Module & M)
+    {
+        int res = 0;
+
+        //called wrapper function to replace _Z6GemmExiiiiii function
+        Function * wrapper_GemmEx_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S5_");
+        if(wrapper_GemmEx_func_ptr == nullptr)
+        {
+            errs()<<"Cannot get the wGEf func\n";
+            exit(1);
+        }
+
+        Function * faster_Gemm_func_ptr = M.getFunction("_Z14mzw_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iii");
+        if(faster_Gemm_func_ptr == nullptr)
+        {
+            errs()<<"Cannot get the fGfp func\n";
+            exit(1);
+        }
+        Function * tuning_GemmEx_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S2_");
+        if(tuning_GemmEx_func_ptr == nullptr)
+        {
+            errs()<<"Cannot get the tuning gemm ptr\n";
+            exit(1);
+        }
+        Function * checker_GemmEx_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiiPcS5_");
+        if(checker_GemmEx_func_ptr == nullptr)
+        {
+            errs()<<"Cannot get the tuning gemm ptr\n";
+            exit(1);
+        }
+
+
+        for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
+            end_Func = M.getFunctionList().end(); func != end_Func; func++)
+        {
+            //Function::iterator == BasicBlockListType::iterator
+            //errs()<<"Now we are facing declare of function "<<func->getName()<<"\n";
+            for(Function::iterator bb = func->begin(); bb != func->end(); bb++)
+            {
+                for(BasicBlock::iterator inst = bb->begin(); inst != bb->end(); inst++)
+                {
+                    if(isa<CallInst>(inst))
+                    {
+                        //QUES.: What about InvokeInst which means indirect call?
+                        Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex" && dyn_cast<Instruction>(inst)->getParent()->getParent() != faster_Gemm_func_ptr
+                            && dyn_cast<Instruction>(inst)->getParent()->getParent() != wrapper_GemmEx_func_ptr
+                            && dyn_cast<Instruction>(inst)->getParent()->getParent() != tuning_GemmEx_func_ptr
+                            && dyn_cast<Instruction>(inst)->getParent()->getParent() != checker_GemmEx_func_ptr)   //TO.DO.: cmp to all func in tool_library containing GemmEx!                                                                     //TO.DO.: Need to ensure the GemmEx in tool_library will not be modified
+                                                                                                                                                                                                                    //ANS.: Done by comparing its caller function to the faster_mul in tool-library
+                        {
+                            res++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return res;
+    }
+
     bool MDFID::runOnModule(Module & M)
     {
         //Set up the output file
@@ -175,7 +237,7 @@ namespace {
             exit(1);
         }
         //called wrapper function to replace _Z6GemmExiiiiii function
-        Function * wrapper_GemmEx_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S5_");
+        Function * wrapper_GemmEx_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S5_");
         if(wrapper_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the wGEf func\n";
@@ -188,13 +250,13 @@ namespace {
             errs()<<"Cannot get the fGfp func\n";
             exit(1);
         }
-        Function * tuning_GemmEx_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
+        Function * tuning_GemmEx_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S2_");
         if(tuning_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tuning gemm ptr\n";
             exit(1);
         }
-        Function * checker_GemmEx_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
+        Function * checker_GemmEx_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiiPcS5_");
         if(checker_GemmEx_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tuning gemm ptr\n";
@@ -206,6 +268,21 @@ namespace {
         FunctionType * wrapper_GemmEx_func_type = wrapper_GemmEx_func_ptr->getFunctionType();
 
         
+        //delcare global run counter for each GEMM
+        //first: get number of all gemmex
+        int gemm_num = CountAllGemmEx(M);
+
+        Type * Int32Type = Type::getInt32Ty(M.getContext());
+        std::vector<GlobalVariable *> run_counters;
+        run_counters.push_back(nullptr);
+        for(int i = 1; i <= gemm_num; i++)
+        {
+            GlobalVariable * run_counter = new GlobalVariable(M,Int32Type,false,GlobalValue::CommonLinkage,0,"mzw_rc"+std::to_string(i));
+            Constant * Zero_Value = Constant::getNullValue(Int32Type);
+            run_counter->setInitializer(Zero_Value);
+            run_counters.push_back(run_counter);
+        }
+
         std::vector<Instruction*> inst_del;
 
         int gemm_id = 0;
@@ -236,7 +313,7 @@ namespace {
 
                             //Dont directly use errs() to print, use a print_func in self-made library(which can use errs() inside)
                             //We only need to replace the original gemmex with a wrapper_gemmex which includes the ouput function inside
-                            IRBuilder<> builder(inst->getNextNode());
+                            IRBuilder<> builder(dyn_cast<Instruction>(inst));
                             std::vector<Value*> args;
 
                             char dimension_file_path_char[200];
@@ -247,15 +324,30 @@ namespace {
                             strcpy(funcID_file_path_char,FuncID_run_file_path.c_str());
                             Value * argv_funcID_file_path = builder.CreateGlobalStringPtr(funcID_file_path_char);
                             
-                            ConstantInt * ID = builder.getInt32(++Func_Counter);
+                            ConstantInt * ID = builder.getInt32(gemm_id);
                             Value * argv_ID = dynamic_cast<Value*>(ID);
                             
-                            std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id) + ".bin";
+                            std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id);         //TODO.: It needs to fullfilled by runtime counter and ".bin" in implementation of rocblas_tool.hip
                             char matrix_file_path_char[200];
                             strcpy(matrix_file_path_char,Matrix_File_Name.c_str());
                             Value * argv_matrix_file_path = builder.CreateGlobalStringPtr(matrix_file_path_char);
 
+                            Value * rc_v = builder.CreateLoad(run_counters[gemm_id]);
+                            if(rc_v == nullptr)
+                            {
+                                errs()<<"Cannot load runtime counter for gemm_"<<gemm_id<<"\n";
+                                exit(1);
+                            }
+                            ConstantInt * Immediate_One = builder.getInt32(1);
+                            Value * added_rc_v = builder.CreateAdd(rc_v,dyn_cast<Value>(Immediate_One));
+                            if(!builder.CreateStore(added_rc_v,run_counters[gemm_id]))
+                            {
+                                errs()<<"Cannot create store inst for added rc value\n";
+                                exit(1);
+                            }
+
                             //replace the function
+                            //get original args
                             unsigned int arg_num = call_inst->arg_size();
                             for(unsigned int i = 0; i < arg_num; i++)
                             {
@@ -269,7 +361,9 @@ namespace {
                                 Value * argv = dynamic_cast<Value*>(arg);                           //TO.DO.: For hipblashandle, because we want a reference to the original handle, so we need to transform it to a reference
                                 args.push_back(argv);
                             }
+                            //add new args
                             args.push_back(argv_ID);
+                            args.push_back(added_rc_v);
                             args.push_back(argv_dimension_file_path);
                             args.push_back(argv_funcID_file_path);
                             args.push_back(argv_matrix_file_path);

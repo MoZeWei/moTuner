@@ -517,16 +517,20 @@ namespace graph{
 
     void DAG::Insert(Node * node)                   //Here we get the func_node in Seq_Graph
     {
+        //Get all needed info of node to init node in dag
         std::vector<Value *> input_v = node->get_input_value();
         std::vector<Value *> output_v = node->get_output_value();
-        
+        std::vector<BasicBlock *> bbs = node->getBBs();
         //errs()<<"Inserting ";
         //node->dump_inst();
 
         CallInst * call_inst = node->getCallInst();
         Function * called_func = node->getFunction();
+        
+        
         //QUES.: Should we specify it as categoried function?
         FuncNode * new_node = new FuncNode(call_inst,called_func,true,true);
+        for(BasicBlock * bb : bbs) new_node->addBB(bb);
         
         //Here we should follow the WAW, WAR, RAW order, so we should find the last pred node using following rule:
         //1. compare new_node's input value to all possible pred's output

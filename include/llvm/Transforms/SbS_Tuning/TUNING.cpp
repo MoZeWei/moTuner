@@ -27,6 +27,7 @@ namespace{
         ~TUNING() {};                                       //Must define this function
 
         bool runOnModule(Module & M) override;
+        int CountAllGemmEx(Module & M);
         bool read_runned_funcID_file();                    //TO.DO.: What result should I get?                                                                  //DONE
         //bool gen_optimized_data_file();
         bool read_optimized_data_file();                    //process the file and get the best parameter combination of each optimized Gemm Function
@@ -76,8 +77,8 @@ namespace{
 
     TUNING::TUNING() : ModulePass(ID)
     {
-        max_err_threshold = std::numeric_limits<float>::max();
-        avg_err_threshold = 0.005;
+        max_err_threshold = 100;
+        avg_err_threshold = std::numeric_limits<float>::max();
         last_tuned_id = -1;                                 //To check when first tuning
     }
 
@@ -158,10 +159,10 @@ namespace{
             std::unordered_map<int,std::vector<std::string>> funcid_keys;       //store all keys corresponding to one func(used when getting best arguments for each func)
         
 
-            int id;
+            int id,runtime_counter;
             int p[3];                           //parameter
             float running_time,avg_err,max_err;
-            while(fs>>id>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
+            while(fs>>id>>runtime_counter>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
             {
                 //get the key in dict data
                 std::string key = std::to_string(id);
@@ -170,20 +171,21 @@ namespace{
                     key += '_';
                     key += std::to_string(p[i]);
                 }
-                funcid_keys[id].push_back(key);
-                //if(data.find(key) != data.end())
-                //For gemm running repeatedly, we only care about its final output
-                //So we overwrite its former record with the last one
-                if(false)
+                //make key in funcid_keys[id] unique
+                bool flag = true;
+                for(auto cmp_key : funcid_keys[id]) if(cmp_key == key) flag = false;
+                if(flag) funcid_keys[id].push_back(key);
+
+                if(data.find(key) != data.end())
                 {
                     float total_running_time = data[key][0] * data[key][3];
-                    float total_avg_err = data[key][1] * data[key][3];
-                    float total_max_err = data[key][2];
                     data[key][3]++;
                     //QUES.: Should these be all avg values or all max values?
+                    //ANS.: Time should avg, because the final arg set influence the whole runningtime
+                    //of this gemm. Err should be both max to keep strict
                     data[key][0] = (total_running_time + running_time)/data[key][3];
-                    data[key][1] = (total_avg_err + avg_err)/data[key][3];
-                    data[key][2] = max_err > total_max_err ? max_err : total_max_err;
+                    data[key][1] = data[key][1] > avg_err ? data[key][1] : avg_err;
+                    data[key][2] = max_err > data[key][2] ? max_err : data[key][2];
                 }
                 else
                 {
@@ -199,7 +201,7 @@ namespace{
                 //here we only care about the func were replaced before and try argument combination 
                 if(funcid_keys.find(runned_func_id)==funcid_keys.end()) continue;
 
-                last_tuned_id = runned_func_id;                                             //We only care about the last one tunned func-id in optimized data file
+                last_tuned_id = runned_func_id;                                          //We only care about the last one tunned func-id in optimized data file
 
                 std::string best_id_argument = "";
                 float best_running_time = std::numeric_limits<float>::max();
@@ -346,11 +348,11 @@ namespace{
             new_fs.close();
             fs.open(last_pass_seperate_error_file_path,std::ios::in);
         }
-        int id,p[3];
+        int id,runtime_counter,p[3];
         float running_time,avg_err,max_err;
         std::unordered_map<std::string,std::vector<float>> data;
         //std::unordered_map<int,std::vector<std::string>> funcid_keys; 
-        while(fs>>id>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
+        while(fs>>id>>runtime_counter>>p[0]>>p[1]>>p[2]>>running_time>>avg_err>>max_err)
         {
             std::string key = std::to_string(id);
             for(int e : p)
@@ -359,17 +361,13 @@ namespace{
                 key += std::to_string(e);
             }
             //funcid_keys[id].push_back(key);
-            //if(data.find(key) != data.end())
-            if(false)
+            if(data.find(key) != data.end())
             {
                 float total_running_time = data[key][0] * data[key][3];
-                float total_avg_err = data[key][1] * data[key][3];
-                float total_max_err = data[key][2];
                 data[key][3]++;
-                //QUES.: Should these be all avg values or all max values?
                 data[key][0] = (total_running_time + running_time)/data[key][3];
-                data[key][1] = (total_avg_err + avg_err)/data[key][3];
-                data[key][2] = max_err > total_max_err ? max_err : total_max_err;
+                data[key][1] = data[key][1] > avg_err ? data[key][1] : avg_err;
+                data[key][2] = max_err > data[key][2] ? max_err : data[key][2];
             }
             else
             {
@@ -435,7 +433,7 @@ namespace{
     void TUNING::get_tool_library_func(Module& M, std::unordered_map<Function*,int> &tool_func_map)
     {
         //get all function pointer in tool-library, these function should not be scanned and optimized
-        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
+        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S2_");
         if(tuning_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the tunning fuc\n";
@@ -458,7 +456,7 @@ namespace{
             exit(1);
         }
         tool_func_map[output_FuncID_func_ptr] = 1;
-        Function * output_ErrP_func_ptr = M.getFunction("_Z31mzw_output_Err_Performance_fileiiiifffPc");
+        Function * output_ErrP_func_ptr = M.getFunction("_Z31mzw_output_Err_Performance_fileiiiiifffPc");
         if(output_ErrP_func_ptr == nullptr)
         {
             errs()<<"Cannot get the oep func\n";
@@ -472,14 +470,14 @@ namespace{
             exit(1);
         }
         tool_func_map[checkerr_func_ptr] = 1;
-        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S5_");
+        Function * wrapper_gemm_func_ptr = M.getFunction("_Z18mzw_wrapper_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S5_");
         if(wrapper_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get the wrapper_gemm func\n";
             exit(1);
         }
         tool_func_map[wrapper_gemm_func_ptr] = 1;
-        Function * rcrp_func_ptr = M.getFunction("_Z35mzw_Result_Check_Record_PerformancePvS_iiiiiifPci");
+        Function * rcrp_func_ptr = M.getFunction("_Z35mzw_Result_Check_Record_PerformancePvS_iiiiiiifPci");
         if(rcrp_func_ptr == nullptr)
         {
             errs()<<"Cannot get the rcrp func\n";
@@ -535,14 +533,14 @@ namespace{
             exit(1);
         }
         tool_func_map[dequan_func_ptr] = 1;  
-        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiPcS5_");
+        Function * checker_faster_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiiPcS5_");
         if(checker_faster_mul_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_faster_mul func\n";
             exit(1);
         }
         tool_func_map[checker_faster_mul_func_ptr] = 1;  
-        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
+        Function * checker_fp32_gemm_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiiPcS5_");
         if(checker_fp32_gemm_func_ptr == nullptr)
         {
             errs()<<"Cannot get checker_fp32_gemm func\n";
@@ -1094,6 +1092,36 @@ namespace{
         errs()<<"*******************************\n";
     }
 
+    int TUNING::CountAllGemmEx(Module & M)
+    {
+        int res = 0;
+        for(Module::FunctionListType::iterator func = M.getFunctionList().begin(),
+            end_Func = M.getFunctionList().end(); func != end_Func; func++)
+        {
+            //Function::iterator == BasicBlockListType::iterator
+            //errs()<<"Now we are facing declare of function "<<func->getName()<<"\n";
+            for(Function::iterator bb = func->begin(); bb != func->end(); bb++)
+            {
+                for(BasicBlock::iterator inst = bb->begin(); inst != bb->end(); inst++)
+                {
+                    if(isa<CallInst>(inst))
+                    {
+                        //QUES.: What about InvokeInst which means indirect call?
+                        Function * called_func = dyn_cast<CallInst>(inst)->getCalledFunction();
+                        Function * caller_func = dyn_cast<Instruction>(inst)->getParent()->getParent();
+                        if(called_func && called_func->getName() == "rocblas_gemm_ex" && 
+                            tool_func_map.find(caller_func) == tool_func_map.end())
+                        {
+                            res++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return res;
+    }
+
     bool TUNING::runOnModule(Module & M)
     {
         std::string ModuleName = M.getModuleIdentifier();
@@ -1131,7 +1159,7 @@ namespace{
 
         //errs()<<"Get all functions in tool-library\n";
 
-        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiPcS5_S2_");
+        Function * tuning_gemm_func_ptr = M.getFunction("_Z17mzw_tuning_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiPcS5_S2_");
         if(tuning_gemm_func_ptr==nullptr)
         {
             errs()<<"Cannot get the tuning gemm func ptr\n";
@@ -1149,7 +1177,7 @@ namespace{
         }
         FunctionType * fastermul_func_type = fastermul_func_ptr->getFunctionType();
         */
-        Function * fastermul_checker_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiPcS5_");
+        Function * fastermul_checker_mul_func_ptr = M.getFunction("_Z22mzw_checker_faster_mulP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijS2_iiiiiPcS5_");
         if(fastermul_checker_mul_func_ptr == nullptr)
         {
             errs()<<"Cannot get the faster_mul_checker func ptr\n";
@@ -1159,7 +1187,7 @@ namespace{
 
         //This is for those gemmex which are checked not suitable for faster_mul
         //they also need to print info on single pass err file
-        Function * original_gemm_wrapper_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiPcS5_");
+        Function * original_gemm_wrapper_func_ptr = M.getFunction("_Z18mzw_checker_GemmExP15_rocblas_handle18rocblas_operation_S1_iiiPvS2_17rocblas_datatype_iS2_S3_iS2_S2_S3_iS2_S3_iS3_18rocblas_gemm_algo_ijiiiiiPcS5_");
         if(original_gemm_wrapper_func_ptr == nullptr)
         {
             errs()<<"Cannot get the original_gemm_wrapper func ptr\n";
@@ -1203,6 +1231,19 @@ namespace{
 
         //Now we have a global memory_pool pointer: void * mzw_mempool = nullptr;
         //value representing size of pool will not generate globally.
+
+        //Global var for each GEMM to record run times
+        int gemm_num = CountAllGemmEx(M);
+        Type * Int32Type = Type::getInt32Ty(M.getContext());
+        std::vector<GlobalVariable *> run_counters;
+        run_counters.push_back(nullptr);
+        for(int i = 1; i <= gemm_num; i++)
+        {
+            GlobalVariable * run_counter = new GlobalVariable(M,Int32Type,false,GlobalValue::CommonLinkage,0,"mzw_rc"+std::to_string(i));
+            Constant * Zero_Value = Constant::getNullValue(Int32Type);
+            run_counter->setInitializer(Zero_Value);
+            run_counters.push_back(run_counter);
+        }
 
         std::vector<Instruction*> inst_del;
 
@@ -1370,7 +1411,7 @@ namespace{
                                             args.push_back(argv);
                                         }
                                         IRBuilder<> builder(dyn_cast<Instruction>(inst));
-                                        //Extra args: int Gemm_ID, int p1, int p2, int p3, char * matrix_file_path, char * single_pass_error_file_path
+                                        //Extra args: int Gemm_ID, int runtime_counter, int p1, int p2, int p3, char * matrix_file_path, char * single_pass_error_file_path
                                         ConstantInt * constantInt_ID = builder.getInt32(gemm_id_tracer);
                                         if(constantInt_ID == nullptr)
                                         {
@@ -1379,6 +1420,21 @@ namespace{
                                         }
                                         Value * argv_id = dynamic_cast<Value*>(constantInt_ID);
                                         args.push_back(argv_id);
+
+                                        Value * rc_v = builder.CreateLoad(run_counters[gemm_id_tracer]);
+                                        if(rc_v == nullptr)
+                                        {
+                                            errs()<<"Cannot load runtime counter for gemm_"<<gemm_id_tracer<<"\n";
+                                            exit(1);
+                                        }
+                                        ConstantInt * Immediate_One = builder.getInt32(1);
+                                        Value * added_rc_v = builder.CreateAdd(rc_v,dyn_cast<Value>(Immediate_One));
+                                        if(!builder.CreateStore(added_rc_v,run_counters[gemm_id_tracer]))
+                                        {
+                                            errs()<<"Cannot create store inst for added rc value\n";
+                                            exit(1);
+                                        }
+                                        args.push_back(added_rc_v);
 
                                         for(int i = 0; i < 3; i++)
                                         {
@@ -1392,7 +1448,7 @@ namespace{
                                             args.push_back(argv_pi);
                                         }
 
-                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer) + ".bin";
+                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer);              //NOTE: Runtime counter is added in rocblas_tool
                                         char matrix_file_path_char[200];
                                         strcpy(matrix_file_path_char,Matrix_File_Name.c_str());
                                         Value * argv_matrix_file_path = builder.CreateGlobalStringPtr(matrix_file_path_char);
@@ -1449,6 +1505,21 @@ namespace{
                                         Value * argv_id = dynamic_cast<Value*>(constantInt_ID);
                                         args.push_back(argv_id);
 
+                                        Value * rc_v = builder.CreateLoad(run_counters[gemm_id_tracer]);
+                                        if(rc_v == nullptr)
+                                        {
+                                            errs()<<"Cannot load runtime counter for gemm_"<<gemm_id_tracer<<"\n";
+                                            exit(1);
+                                        }
+                                        ConstantInt * Immediate_One = builder.getInt32(1);
+                                        Value * added_rc_v = builder.CreateAdd(rc_v,dyn_cast<Value>(Immediate_One));
+                                        if(!builder.CreateStore(added_rc_v,run_counters[gemm_id_tracer]))
+                                        {
+                                            errs()<<"Cannot create store inst for added rc value\n";
+                                            exit(1);
+                                        }
+                                        args.push_back(added_rc_v);
+
                                         for(int i = 0 ; i < 3; i ++)
                                         {
                                             ConstantInt * constantInt_pi = builder.getInt32(best_arguments[gemm_id_tracer][i]);
@@ -1461,7 +1532,7 @@ namespace{
                                             args.push_back(argv_pi);
                                         }
 
-                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer) + ".bin";
+                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer);
                                         char matrix_file_path_char[200];
                                         strcpy(matrix_file_path_char,Matrix_File_Name.c_str());
                                         Value * argv_matrix_file_path = builder.CreateGlobalStringPtr(matrix_file_path_char);
@@ -1506,11 +1577,26 @@ namespace{
                                         ConstantInt * ID = builder.getInt32(gemm_id_tracer);
                                         Value * argv_id = dynamic_cast<Value*>(ID);
 
+                                        Value * rc_v = builder.CreateLoad(run_counters[gemm_id_tracer]);
+                                        if(rc_v == nullptr)
+                                        {
+                                            errs()<<"Cannot load runtime counter for gemm_"<<gemm_id_tracer<<"\n";
+                                            exit(1);
+                                        }
+                                        ConstantInt * Immediate_One = builder.getInt32(1);
+                                        Value * added_rc_v = builder.CreateAdd(rc_v,dyn_cast<Value>(Immediate_One));
+                                        if(!builder.CreateStore(added_rc_v,run_counters[gemm_id_tracer]))
+                                        {
+                                            errs()<<"Cannot create store inst for added rc value\n";
+                                            exit(1);
+                                        }
+                                        
+
                                         char optimized_data_file_path_char[200];
                                         strcpy(optimized_data_file_path_char, optimized_data_file_path.c_str());
                                         Value * argv_optimized_data_file_path = builder.CreateGlobalStringPtr(optimized_data_file_path_char);
                                         
-                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer) + ".bin";
+                                        std::string Matrix_File_Name = father_path + "GEMM_" + std::to_string(gemm_id_tracer);
                                         char matrix_file_path_char[200];
                                         strcpy(matrix_file_path_char,Matrix_File_Name.c_str());
                                         Value * argv_matrix_file_path = builder.CreateGlobalStringPtr(matrix_file_path_char);
@@ -1523,6 +1609,7 @@ namespace{
                                         }
 
                                         args.push_back(argv_id);
+                                        args.push_back(added_rc_v);
                                         args.push_back(argv_optimized_data_file_path);
                                         args.push_back(argv_matrix_file_path);
                                         args.push_back(argv_poolptr);
