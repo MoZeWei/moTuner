@@ -34,6 +34,8 @@ namespace{
         bool make_runned_func_ID_set();                     //When reading runned_funcID_file, if meet repeated id, call this func to re-organize the runned_funcID_file
                                                             //next time we wont run into repeated runned func id
         bool get_biggest_dimension();
+        void write_ban_id(std::string);
+        void read_ban_id(std::string);
         //bool is_in_list(int,std::vector<int>);
         void get_tool_library_func(Module & , std::unordered_map<Function*,int>& );
         std::string get_father_path(std::string);
@@ -57,6 +59,7 @@ namespace{
         std::vector<int> to_repair_funcID_list;                   //This is for those current func with too much error
         std::unordered_map<int,std::vector<int>> best_arguments;
         std::unordered_map<Function*,int> tool_func_map;
+        std::unordered_map<int,bool> baned_id_settings;
         
         float max_err_threshold;                            //TO.DO.: Use Command line to set these two value
         float avg_err_threshold;
@@ -77,8 +80,8 @@ namespace{
 
     TUNING::TUNING() : ModulePass(ID)
     {
-        max_err_threshold = 100;
-        avg_err_threshold = std::numeric_limits<float>::max();
+        max_err_threshold = std::numeric_limits<float>::max();
+        avg_err_threshold = 0.00005;
         last_tuned_id = -1;                                 //To check when first tuning
     }
 
@@ -203,10 +206,19 @@ namespace{
 
                 last_tuned_id = runned_func_id;                                          //We only care about the last one tunned func-id in optimized data file
 
+                std::string fp32_id_argument = std::to_string(runned_func_id) + "_-1_-1_-1";
+                std::string skipped_id_argument = std::to_string(runned_func_id) + "_1_1_0";
                 std::string best_id_argument = "";
                 float best_running_time = std::numeric_limits<float>::max();
                 for(std::string key : funcid_keys[runned_func_id])
                 {
+                    //check what setting for this func is slower than fp32
+                    if(key == skipped_id_argument && data[key][0] > data[fp32_id_argument][0])
+                    {
+                        baned_id_settings[runned_func_id] = true;
+                    }
+
+
                     if(data[key][1] <= avg_err_threshold && data[key][2] <= max_err_threshold)
                     //TO.DO.: If the error of fp32/fp32(not replaced by faster_mul) is still too high
                     //What should we do?
@@ -246,7 +258,8 @@ namespace{
                     //because for last-tuned gemm, the first upgrade is to be 1,1,0 anyway(except for the first gemm)
                     //this is left for later process, but need to use last_tuned_id to specify it.
                     //If it's the first gemm, it just need to be set to -1-1-1
-                    best_arguments[runned_func_id] = {0,0,0};
+                    if(baned_id_settings.find(runned_func_id) != baned_id_settings.end()) best_arguments[runned_func_id] = {-1,-1,-1};
+                    else best_arguments[runned_func_id] = {0,0,0};
                     continue;
                 }
 
@@ -271,6 +284,7 @@ namespace{
             //TO.DO.: we flush the optimized data file here so that every time we read this file, it only contains                  //DONE
             //tuning info about one gemm.
             flush_file(optimized_data_file_path);
+
 
             return true;
         }
@@ -403,7 +417,9 @@ namespace{
             {
                 to_repair_funcID_list.push_back(tmp[0]);
                 std::cout<<"The "<<tmp[0]<<"th func needs to repair"<<std::endl;
-                best_arguments[tmp[0]] = {tmp[1],tmp[2],tmp[3]};
+                
+                if(baned_id_settings.find(tmp[0]) != baned_id_settings.end()) best_arguments[tmp[0]] = {-1,-1,-1};
+                else best_arguments[tmp[0]] = {tmp[1],tmp[2],tmp[3]};
             }
 
         }
@@ -412,6 +428,49 @@ namespace{
 
         flush_file(last_pass_seperate_error_file_path);
         return true;
+    }
+
+    void TUNING::read_ban_id(std::string file_path)
+    {
+        std::fstream fs(file_path,std::ios::in);
+        if(!fs)
+        {
+            std::cout<<"Cannot open ban id file\n";
+            std::fstream flush_fs(file_path,std::ios::out);
+            flush_fs<<"";
+            flush_fs.close();
+        }
+        else
+        {
+            int id;
+            while(fs>>id)
+            {
+                baned_id_settings[id] = true;
+            }
+            fs.close();
+            std::fstream flush_fs(file_path,std::ios::out);
+            flush_fs<<"";
+            flush_fs.close();
+        }
+    }
+
+    void TUNING::write_ban_id(std::string file_path)
+    {
+        std::fstream fs(file_path,std::ios::app);
+        if(!fs)
+        {
+            std::cout<<"Cannot open ban id file\n";
+            exit(1);
+        }
+        else
+        {
+            for(auto it = baned_id_settings.begin(); it != baned_id_settings.end(); it++) 
+            {
+                int id = it->first;
+                fs<<id<<"\n";
+            }
+            fs.close();
+        }
     }
 
     void TUNING::flush_file(std::string file_path)
@@ -765,26 +824,26 @@ namespace{
                     if(called_func && called_func->getName() == "rocblas_gemm_ex")
                     {
                         int cur_id = gemm_call_inst_int_map[inst];
-                        errs()<<"Target arg: "<<*target_arg<<"\n";
-                        errs()<<"Target id: "<<target_id<<"\n";
-                        errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
+                        //errs()<<"Target arg: "<<*target_arg<<"\n";
+                        //errs()<<"Target id: "<<target_id<<"\n";
+                        //errs()<<"We found the call_inst of GemmEx: "<<*call_inst<<"\n";
                         //we only care about those gemmex that accept this arg as output
                         //NOTE: This makes us wont add gemmex itself into its dependence list
                         if(target_arg==call_inst->getArgOperand(17))
                         {
-                            errs()<<*call_inst<<" Yes!\n";
-                            errs()<<"Target arg: "<<*target_arg<<"\n";
-                            errs()<<"Target id: "<<target_id<<"\n";
+                            //errs()<<*call_inst<<" Yes!\n";
+                            //errs()<<"Target arg: "<<*target_arg<<"\n";
+                            //errs()<<"Target id: "<<target_id<<"\n";
                             //TO.DO.: Avoid searching the same gemm                        //DONE
                             if( related_gemm_id_map.find(target_id) != related_gemm_id_map.end()
                                 &&is_in_list<int>(related_gemm_id_map[target_id],cur_id))
                             {
                                 //do nothing
-                                errs()<<"We occur the same GemmEx with id "<<cur_id<<" when targeting "<<target_id<<"\n";
+                                //errs()<<"We occur the same GemmEx with id "<<cur_id<<" when targeting "<<target_id<<"\n";
                             }
                             else
                             {
-                                errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
+                                //errs()<<"The "<<target_id<<"th GemmEx depends on "<<cur_id<<"th GemmEx\n";
                                 related_gemm_id_map[target_id].push_back(cur_id);
                                 //dataflow_dfs(call_inst->getOperand(7),caller_func, cur_id, dfsed_value_map);
                                 //dataflow_dfs(call_inst->getOperand(10),caller_func, cur_id, dfsed_value_map);
@@ -1131,12 +1190,15 @@ namespace{
         optimized_data_file_path = father_path+"optimized_data.txt";
         dimension_file_path = father_path+"dimension.txt";
         last_pass_seperate_error_file_path = father_path+"single_pass_err.txt";
+        std::string ban_id_file_path = father_path+"ban_id.txt";
 
+        read_ban_id(ban_id_file_path);
         get_tool_library_func(M,tool_func_map);
         read_runned_funcID_file();
         read_optimized_data_file();
         get_biggest_dimension();
         read_last_pass_seperate_error();
+        write_ban_id(ban_id_file_path);
 
         //re-adjust the best_arguments based on repaired_func_id_list
         best_arguments_repair(M);
