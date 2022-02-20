@@ -228,7 +228,7 @@ namespace{
                                         Value * argv_poolptr = builder.CreateLoad(gvar_ptr_mempool,"mzw_pool_ptr");
                                         if(argv_poolptr == nullptr)
                                         {
-                                            errs()<<"Cannot get poolptr arg for checker_faster_mul func\n";
+                                            errs()<<"Cannot get poolptr arg for faster_mul func\n";
                                             exit(1);
                                         }
                                         args.push_back(argv_poolptr);
