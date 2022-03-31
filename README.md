@@ -1,4 +1,4 @@
-# HIPCC_LLVM
+# moTuner
 
 ## 使用前配备
 
