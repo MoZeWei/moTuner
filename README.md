@@ -1,5 +1,7 @@
 # moTuner
 
+## 该仓库为 19th ACM International Conference on Computing Frontiers (CF'22) 的论文 《moTuner: A Compiler-based Auto-tuning Approach for Mixed-precision Operator》的官方实现。
+
 ## 使用前配备
 
 * 使用下列命令配置初始环境。
