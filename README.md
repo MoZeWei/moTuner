@@ -1,4 +1,4 @@
-# moTuner: A Compiler-based Auto-tuning Approach for Mixed-precision Operator
+# moTuner: A Compiler-based Auto-tuning Approach for Mixed-precision Operators
 
 ## Related Publication:
 
