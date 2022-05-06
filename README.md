@@ -2,7 +2,22 @@
 
 ## Related Publication:
 
-```  ```
+It's our honor and pleasure to be cited in your paper if you refer our work in it. Thank you!
+
+``` 
+@inproceedings{10.1145/3528416.3530231,
+author = {Mo, Zewei and Lin, Zejia and Zhang, Xianwei and Lu, Yutong},
+title = {MoTuner: A Compiler-Based Auto-Tuning Approach for Mixed-Precision Operators},
+year = {2022},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+booktitle = {Proceedings of the 19th ACM International Conference on Computing Frontiers},
+pages = {94–102},
+numpages = {9},
+location = {Turin, Italy},
+series = {CF '22}
+} 
+```
 
 ## Installation and Enviornment Preparation
 
