@@ -2,7 +2,7 @@
 
 ## Related Publication:
 
-It's our honor and pleasure to be cited in your paper if you refer our work in it. Thank you!
+It's our honor and pleasure to be cited in your paper. Thank you!
 
 ``` 
 @inproceedings{10.1145/3528416.3530231,
